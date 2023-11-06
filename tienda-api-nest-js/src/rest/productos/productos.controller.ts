@@ -21,33 +21,33 @@ export class ProductosController {
   @Get()
   async findAll() {
     this.logger.log('Find all productos')
-    return this.productosService.findAll()
+    return await this.productosService.findAll()
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
     this.logger.log(`Find one producto by id:${id}`)
-    return this.productosService.findOne(id)
+    return await this.productosService.findOne(id)
   }
 
   @Post()
-  create(@Body() createProductoDto: CreateProductoDto) {
+  async create(@Body() createProductoDto: CreateProductoDto) {
     this.logger.log(`Create producto ${createProductoDto}`)
-    return this.productosService.create(createProductoDto)
+    return await this.productosService.create(createProductoDto)
   }
 
   @Put(':id')
-  update(
+  async pdate(
     @Param('id') id: string,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
     this.logger.log(`Update producto with id:${id}-${updateProductoDto}`)
-    return this.productosService.update(+id, updateProductoDto)
+    return await this.productosService.update(+id, updateProductoDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     this.logger.log('Remove producto with id:${id}')
-    return this.productosService.remove(+id)
+    return await this.productosService.remove(+id)
   }
 }

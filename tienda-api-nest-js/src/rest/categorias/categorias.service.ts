@@ -4,6 +4,7 @@ import { UpdateCategoriaDto } from './dto/update-categoria.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CategoriaEntity } from './entities/categoria.entity'
 import { Repository } from 'typeorm'
+import { CategoriasMapper } from './mappers/categorias.mapper/categorias.mapper'
 
 @Injectable()
 export class CategoriasService {
@@ -12,6 +13,7 @@ export class CategoriasService {
   constructor(
     @InjectRepository(CategoriaEntity)
     private readonly categoriaRepository: Repository<CategoriaEntity>,
+    private readonly categoriasMapper: CategoriasMapper,
   ) {}
 
   async findAll() {
@@ -31,18 +33,22 @@ export class CategoriasService {
 
   async create(createCategoriaDto: CreateCategoriaDto) {
     this.logger.log(`Create categoria ${createCategoriaDto}`)
-    return 'This action adds a new categoria'
+    // Añadimos un id único a la categoría, porque no lo hemos hecho en el mapper
+    return await this.categoriaRepository.save(
+      this.categoriasMapper.toEntity(createCategoriaDto),
+    )
   }
 
   async update(id: string, updateCategoriaDto: UpdateCategoriaDto) {
     this.logger.log(`Update categoria by id:${id} - ${updateCategoriaDto}`)
-    const categoriaToUpdate = this.findOne(id)
-    return `This action updates a #${id} categoria`
+    const myCategory = await this.findOne(id)
+    const categoryToUpdated = { ...myCategory, ...updateCategoriaDto }
+    return await this.categoriaRepository.save(categoryToUpdated)
   }
 
   async remove(id: string) {
     this.logger.log(`Remove categoria by id:${id}`)
-    const categoriaToRemove = this.findOne(id)
-    return `This action removes a #${id} categoria`
+    const categoriaToRemove = await this.findOne(id)
+    return await this.categoriaRepository.remove(categoriaToRemove)
   }
 }

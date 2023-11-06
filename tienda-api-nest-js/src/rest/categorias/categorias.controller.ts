@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Logger,
   Param,
   ParseUUIDPipe,
@@ -22,33 +23,35 @@ export class CategoriasController {
   @Get()
   async findAll() {
     this.logger.log('Find all categorias')
-    return this.categoriasService.findAll()
+    return await this.categoriasService.findAll()
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     this.logger.log(`Find one categoria by id:${id}`)
-    return this.categoriasService.findOne(id)
+    return await this.categoriasService.findOne(id)
   }
 
   @Post()
-  create(@Body() createCategoriaDto: CreateCategoriaDto) {
+  @HttpCode(201)
+  async create(@Body() createCategoriaDto: CreateCategoriaDto) {
     this.logger.log(`Create categoria ${createCategoriaDto}`)
-    return this.categoriasService.create(createCategoriaDto)
+    return await this.categoriasService.create(createCategoriaDto)
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoriaDto: UpdateCategoriaDto,
   ) {
     this.logger.log(`Update categoria with id:${id} - ${updateCategoriaDto}`)
-    return this.categoriasService.update(id, updateCategoriaDto)
+    return await this.categoriasService.update(id, updateCategoriaDto)
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  @HttpCode(204)
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     this.logger.log(`Remove categoria with id:${id}`)
-    return this.categoriasService.remove(id)
+    await this.categoriasService.remove(id)
   }
 }

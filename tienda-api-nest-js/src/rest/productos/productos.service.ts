@@ -30,20 +30,20 @@ export class ProductosService {
     return patientToFound
   }
 
-  create(createProductoDto: CreateProductoDto) {
+  async create(createProductoDto: CreateProductoDto) {
     this.logger.log('Create producto ${createProductoDto}')
     return 'This action adds a new producto'
   }
 
-  update(id: number, updateProductoDto: UpdateProductoDto) {
+  async update(id: number, updateProductoDto: UpdateProductoDto) {
     this.logger.log(`Update producto by id:${id} - ${updateProductoDto}`)
-    const patientToUpdate = this.findOne(id)
+    const patientToUpdate = await this.findOne(id)
     return `This action updates a #${id} producto`
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     this.logger.log(`Remove producto by id:${id}`)
-    const patientToRemove = this.findOne(id)
-    return `This action removes a #${id} producto`
+    const patientToRemove = await this.findOne(id)
+    return await this.productoRepository.remove(patientToRemove)
   }
 }

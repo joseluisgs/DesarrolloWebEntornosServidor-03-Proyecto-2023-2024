@@ -125,7 +125,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nombre\": \"{{$randomProductName}}\",\r\n    \"isDeleted\": false\r\n}",
+							"raw": "{\r\n    \"nombre\": \"{{$randomProductName}}\",\r\n    \"isDeleted\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -133,7 +133,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
+							"raw": "http://localhost:3000/v1/categorias/ab098b7a-38b5-4390-81f6-ea997e145739",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -142,37 +142,7 @@
 							"path": [
 								"v1",
 								"categorias",
-								"6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PATCH and update partial",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"isDeleted\": true\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"v1",
-								"categorias",
-								"6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154"
+								"ab098b7a-38b5-4390-81f6-ea997e145739"
 							]
 						}
 					},
@@ -184,7 +154,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
+							"raw": "http://localhost:3000/v1/categorias/aa1d52d0-f79c-4f6f-8b4c-fd506e8c6e59",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -193,7 +163,7 @@
 							"path": [
 								"v1",
 								"categorias",
-								"6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154"
+								"aa1d52d0-f79c-4f6f-8b4c-fd506e8c6e59"
 							]
 						}
 					},

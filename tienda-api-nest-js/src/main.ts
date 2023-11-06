@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import * as process from 'process'
+import { ValidationPipe } from '@nestjs/common'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   // Configuración de la versión de la API
   app.setGlobalPrefix(process.env.API_VERSION || 'v1')
+  // Activamos las validaciones body y dtos
+  app.useGlobalPipes(new ValidationPipe())
   // Configuración del puerto de escucha
   await app.listen(process.env.API_PORT || 3000)
 }
