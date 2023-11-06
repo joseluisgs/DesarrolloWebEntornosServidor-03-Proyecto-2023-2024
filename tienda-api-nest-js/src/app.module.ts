@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { ProductosModule } from './rest/productos/productos.module';
+import { ProductosModule } from './rest/productos/productos.module'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
-  imports: [ProductosModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    // Lo primero es cargar la configuración de la aplicación y que esta esté disponible en el módulo raíz
+    ConfigModule.forRoot(),
+    // Luego se cargan los módulos de la aplicación
+    ProductosModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
