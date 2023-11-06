@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ProductosModule } from './rest/productos/productos.module'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { CategoriasModule } from './rest/categorias/categorias.module';
 import * as process from 'process'
 
 @Module({
@@ -24,6 +25,7 @@ import * as process from 'process'
     }),
     // Luego se cargan los módulos de la aplicación
     ProductosModule,
+    CategoriasModule,
   ],
   controllers: [],
   providers: [],

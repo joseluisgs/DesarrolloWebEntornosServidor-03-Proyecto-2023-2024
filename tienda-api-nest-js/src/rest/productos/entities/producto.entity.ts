@@ -8,7 +8,7 @@ import {
 
 @Entity({ name: 'productos' }) // Nombre de la tabla (es case sensitive!!!)
 export class ProductoEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() // Autoincremental
   id: number
 
   @Column({ type: 'varchar', length: 255, nullable: false })

@@ -14,7 +14,7 @@ import { UpdateProductoDto } from './dto/update-producto.dto'
 
 @Controller('productos')
 export class ProductosController {
-  private logger: Logger = new Logger(ProductosController.name)
+  private readonly logger: Logger = new Logger(ProductosController.name)
 
   constructor(private readonly productosService: ProductosService) {}
 

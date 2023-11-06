@@ -7,7 +7,7 @@ import { Repository } from 'typeorm'
 
 @Injectable()
 export class ProductosService {
-  private logger: Logger = new Logger(ProductosService.name)
+  private readonly logger: Logger = new Logger(ProductosService.name)
 
   // Inmyectamos el repositorio de la entidad ProductoEntity
   constructor(
@@ -37,11 +37,13 @@ export class ProductosService {
 
   update(id: number, updateProductoDto: UpdateProductoDto) {
     this.logger.log(`Update producto by id:${id} ${updateProductoDto}`)
+    const patientToUpdate = this.findOne(id)
     return `This action updates a #${id} producto`
   }
 
   remove(id: number) {
     this.logger.log(`Remove producto by id:${id}`)
+    const patientToRemove = this.findOne(id)
     return `This action removes a #${id} producto`
   }
 }
