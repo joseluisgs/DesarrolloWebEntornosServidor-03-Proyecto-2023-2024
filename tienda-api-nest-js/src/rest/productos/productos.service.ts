@@ -31,12 +31,12 @@ export class ProductosService {
   }
 
   create(createProductoDto: CreateProductoDto) {
-    this.logger.log('Create producto')
+    this.logger.log('Create producto ${createProductoDto}')
     return 'This action adds a new producto'
   }
 
   update(id: number, updateProductoDto: UpdateProductoDto) {
-    this.logger.log(`Update producto by id:${id} ${updateProductoDto}`)
+    this.logger.log(`Update producto by id:${id} - ${updateProductoDto}`)
     const patientToUpdate = this.findOne(id)
     return `This action updates a #${id} producto`
   }

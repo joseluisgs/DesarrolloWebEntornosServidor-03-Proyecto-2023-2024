@@ -30,11 +30,12 @@ export class CategoriasService {
   }
 
   async create(createCategoriaDto: CreateCategoriaDto) {
+    this.logger.log(`Create categoria ${createCategoriaDto}`)
     return 'This action adds a new categoria'
   }
 
   async update(id: string, updateCategoriaDto: UpdateCategoriaDto) {
-    this.logger.log(`Update categoria by id:${id} ${updateCategoriaDto}`)
+    this.logger.log(`Update categoria by id:${id} - ${updateCategoriaDto}`)
     const categoriaToUpdate = this.findOne(id)
     return `This action updates a #${id} categoria`
   }

@@ -104,8 +104,8 @@
 							}
 						},
 						"url": {
-							"raw": "https://localhost:3000/v1/categorias",
-							"protocol": "https",
+							"raw": "http://localhost:3000/v1/categorias",
+							"protocol": "http",
 							"host": [
 								"localhost"
 							],
@@ -133,8 +133,8 @@
 							}
 						},
 						"url": {
-							"raw": "https://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
-							"protocol": "https",
+							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
+							"protocol": "http",
 							"host": [
 								"localhost"
 							],
@@ -163,8 +163,8 @@
 							}
 						},
 						"url": {
-							"raw": "https://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
-							"protocol": "https",
+							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
+							"protocol": "http",
 							"host": [
 								"localhost"
 							],
@@ -184,8 +184,8 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
-							"protocol": "https",
+							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
+							"protocol": "http",
 							"host": [
 								"localhost"
 							],

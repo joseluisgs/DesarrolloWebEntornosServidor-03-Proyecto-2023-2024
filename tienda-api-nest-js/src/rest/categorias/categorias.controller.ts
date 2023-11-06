@@ -6,8 +6,8 @@ import {
   Logger,
   Param,
   ParseUUIDPipe,
-  Patch,
   Post,
+  Put,
 } from '@nestjs/common'
 import { CategoriasService } from './categorias.service'
 import { CreateCategoriaDto } from './dto/create-categoria.dto'
@@ -33,19 +33,22 @@ export class CategoriasController {
 
   @Post()
   create(@Body() createCategoriaDto: CreateCategoriaDto) {
+    this.logger.log(`Create categoria ${createCategoriaDto}`)
     return this.categoriasService.create(createCategoriaDto)
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoriaDto: UpdateCategoriaDto,
   ) {
+    this.logger.log(`Update categoria with id:${id} - ${updateCategoriaDto}`)
     return this.categoriasService.update(id, updateCategoriaDto)
   }
 
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
+    this.logger.log(`Remove categoria with id:${id}`)
     return this.categoriasService.remove(id)
   }
 }

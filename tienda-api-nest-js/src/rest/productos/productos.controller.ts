@@ -5,8 +5,8 @@ import {
   Get,
   Logger,
   Param,
-  Patch,
   Post,
+  Put,
 } from '@nestjs/common'
 import { ProductosService } from './productos.service'
 import { CreateProductoDto } from './dto/create-producto.dto'
@@ -18,12 +18,6 @@ export class ProductosController {
 
   constructor(private readonly productosService: ProductosService) {}
 
-  @Post()
-  create(@Body() createProductoDto: CreateProductoDto) {
-    this.logger.log('Create producto')
-    return this.productosService.create(createProductoDto)
-  }
-
   @Get()
   async findAll() {
     this.logger.log('Find all productos')
@@ -32,22 +26,28 @@ export class ProductosController {
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    this.logger.log('Find one producto')
+    this.logger.log(`Find one producto by id:${id}`)
     return this.productosService.findOne(id)
   }
 
-  @Patch(':id')
+  @Post()
+  create(@Body() createProductoDto: CreateProductoDto) {
+    this.logger.log(`Create producto ${createProductoDto}`)
+    return this.productosService.create(createProductoDto)
+  }
+
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
-    this.logger.log('Update producto')
+    this.logger.log(`Update producto with id:${id}-${updateProductoDto}`)
     return this.productosService.update(+id, updateProductoDto)
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    this.logger.log('Remove producto')
+    this.logger.log('Remove producto with id:${id}')
     return this.productosService.remove(+id)
   }
 }
