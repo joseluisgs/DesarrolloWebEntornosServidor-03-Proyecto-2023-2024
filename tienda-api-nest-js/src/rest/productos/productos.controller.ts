@@ -25,7 +25,7 @@ export class ProductosController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     this.logger.log('Find all productos')
     return this.productosService.findAll()
   }
