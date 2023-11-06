@@ -31,9 +31,9 @@ export class ProductosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     this.logger.log('Find one producto')
-    return this.productosService.findOne(+id)
+    return this.productosService.findOne(id)
   }
 
   @Patch(':id')
