@@ -5,6 +5,7 @@ import {
   Get,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common'
@@ -25,7 +26,7 @@ export class CategoriasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     this.logger.log(`Find one categoria by id:${id}`)
     return this.categoriasService.findOne(id)
   }
@@ -37,14 +38,14 @@ export class CategoriasController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoriaDto: UpdateCategoriaDto,
   ) {
     return this.categoriasService.update(id, updateCategoriaDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.categoriasService.remove(id)
   }
 }
