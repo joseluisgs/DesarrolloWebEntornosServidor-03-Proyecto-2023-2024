@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ProductosService } from './productos.service';
-import { CreateProductoDto } from './dto/create-producto.dto';
-import { UpdateProductoDto } from './dto/update-producto.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common'
+import { ProductosService } from './productos.service'
+import { CreateProductoDto } from './dto/create-producto.dto'
+import { UpdateProductoDto } from './dto/update-producto.dto'
 
 @Controller('productos')
 export class ProductosController {
+  private logger: Logger = new Logger(ProductosController.name)
+
   constructor(private readonly productosService: ProductosService) {}
 
   @Post()
   create(@Body() createProductoDto: CreateProductoDto) {
-    return this.productosService.create(createProductoDto);
+    this.logger.log('Create producto')
+    return this.productosService.create(createProductoDto)
   }
 
   @Get()
   findAll() {
-    return this.productosService.findAll();
+    this.logger.log('Find all productos')
+    return this.productosService.findAll()
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.productosService.findOne(+id);
+    this.logger.log('Find one producto')
+    return this.productosService.findOne(+id)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
-    return this.productosService.update(+id, updateProductoDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateProductoDto: UpdateProductoDto,
+  ) {
+    this.logger.log('Update producto')
+    return this.productosService.update(+id, updateProductoDto)
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.productosService.remove(+id);
+    this.logger.log('Remove producto')
+    return this.productosService.remove(+id)
   }
 }
