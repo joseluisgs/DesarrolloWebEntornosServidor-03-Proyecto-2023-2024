@@ -15,6 +15,6 @@ bootstrap().then(() =>
   console.log(
     `🟢 Servidor escuchando en puerto: ${
       process.env.API_PORT || 3000
-    } y perfil: ${process.env.PERFIL} 🚀`,
+    } y perfil: ${process.env.NODE_ENV} 🚀`,
   ),
 )
