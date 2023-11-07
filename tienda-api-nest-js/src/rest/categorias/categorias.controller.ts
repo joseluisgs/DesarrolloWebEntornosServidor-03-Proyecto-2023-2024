@@ -52,6 +52,9 @@ export class CategoriasController {
   @HttpCode(204)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     this.logger.log(`Remove categoria with id:${id}`)
-    await this.categoriasService.remove(id)
+    // Borrado fisico
+    //await this.categoriasService.remove(id)
+    // Borrado logico
+    await this.categoriasService.removeSoft(id)
   }
 }

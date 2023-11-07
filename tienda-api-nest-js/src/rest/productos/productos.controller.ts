@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Logger,
   Param,
   Post,
@@ -31,6 +32,7 @@ export class ProductosController {
   }
 
   @Post()
+  @HttpCode(201)
   async create(@Body() createProductoDto: CreateProductoDto) {
     this.logger.log(`Create producto ${createProductoDto}`)
     return await this.productosService.create(createProductoDto)
@@ -38,16 +40,20 @@ export class ProductosController {
 
   @Put(':id')
   async pdate(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
     this.logger.log(`Update producto with id:${id}-${updateProductoDto}`)
-    return await this.productosService.update(+id, updateProductoDto)
+    return await this.productosService.update(id, updateProductoDto)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  @HttpCode(204)
+  async remove(@Param('id') id: number) {
     this.logger.log('Remove producto with id:${id}')
-    return await this.productosService.remove(+id)
+    // borrado fisico
+    // return await this.productosService.remove(id)
+    // borrado logico
+    return await this.productosService.removeSoft(id)
   }
 }

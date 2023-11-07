@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { ProductoEntity } from '../../productos/entities/producto.entity'
 
 @Entity({ name: 'categorias' }) // Case sensitive
 export class CategoriaEntity {
@@ -31,4 +33,11 @@ export class CategoriaEntity {
 
   @Column({ name: 'is_deleted', type: 'boolean', default: false })
   isDeleted: boolean
+
+  // Relación uno a muchos con la entidad ProductoEntity
+  // Un producto pertenece a una categoría
+  // Una categoría tiene muchos productos
+  // 1:N
+  @OneToMany(() => ProductoEntity, (producto) => producto.categoria)
+  productos: ProductoEntity[]
 }

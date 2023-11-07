@@ -2,13 +2,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { CategoriaEntity } from '../../categorias/entities/categoria.entity'
 
 @Entity({ name: 'productos' }) // Nombre de la tabla (es case sensitive!!!)
 export class ProductoEntity {
-  @PrimaryGeneratedColumn() // Autoincremental
+  @PrimaryGeneratedColumn({ type: 'bigint' }) // Autoincremental, le pongo bigint porque en postgresql el tipo serial es bigint
   id: number
 
   @Column({ type: 'varchar', length: 255, nullable: false })
@@ -50,6 +53,11 @@ export class ProductoEntity {
   @Column({ name: 'is_deleted', type: 'boolean', default: false })
   isDeleted: boolean
 
-  @Column({ name: 'categoria_id', type: 'uuid', nullable: true })
-  categoriaId: string
+  // Relación muchos a uno con la entidad CategoriaEntity
+  // Un producto pertenece a una categoría
+  // Una categoría tiene muchos productos
+  // N:1
+  @ManyToOne(() => CategoriaEntity, (categoria) => categoria.productos)
+  @JoinColumn({ name: 'categoria_id' }) // Especifica el nombre de la columna
+  categoria: CategoriaEntity
 }
