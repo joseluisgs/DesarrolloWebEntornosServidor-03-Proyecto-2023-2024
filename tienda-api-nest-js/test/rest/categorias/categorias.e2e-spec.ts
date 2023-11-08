@@ -5,6 +5,8 @@ import { CategoriaEntity } from '../../../src/rest/categorias/entities/categoria
 import * as request from 'supertest'
 import { CategoriasController } from '../../../src/rest/categorias/categorias.controller'
 
+// https://blog.logrocket.com/end-end-testing-nestjs-typeorm/
+
 describe('CategoriasController (e2e)', () => {
   let app: INestApplication
   const myEndpoint = `/categorias`
