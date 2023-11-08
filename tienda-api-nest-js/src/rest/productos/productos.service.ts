@@ -52,7 +52,7 @@ export class ProductosService {
       .getOne()
 
     if (!productToFind) {
-      throw new NotFoundException(`Producto with id ${id} not found`)
+      throw new NotFoundException(`Producto con id ${id} no encontrado`)
     }
 
     return this.productosMapper.toResponseDto(productToFind)
