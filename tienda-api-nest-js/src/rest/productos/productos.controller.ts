@@ -39,7 +39,7 @@ export class ProductosController {
   }
 
   @Put(':id')
-  async pdate(
+  async update(
     @Param('id') id: number,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
