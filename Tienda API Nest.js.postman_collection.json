@@ -133,7 +133,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/v1/categorias/ab098b7a-38b5-4390-81f6-ea997e145739",
+							"raw": "http://localhost:3000/v1/categorias/6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -142,7 +142,7 @@
 							"path": [
 								"v1",
 								"categorias",
-								"ab098b7a-38b5-4390-81f6-ea997e145739"
+								"6dbcbf5e-8e1c-47cc-8578-7b0a33ebc154"
 							]
 						}
 					},
