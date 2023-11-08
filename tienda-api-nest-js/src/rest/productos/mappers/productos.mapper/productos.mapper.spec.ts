@@ -66,6 +66,8 @@ describe('ProductosMapper', () => {
       categoriaEntity,
     )
 
+    expect(actualProductoEntity).toBeInstanceOf(ProductoEntity)
+
     expect(actualProductoEntity.marca).toEqual(expectedProductoEntity.marca)
     expect(actualProductoEntity.modelo).toEqual(expectedProductoEntity.modelo)
     expect(actualProductoEntity.descripcion).toEqual(
@@ -87,6 +89,8 @@ describe('ProductosMapper', () => {
 
     const actualResponseProductoDto: ResponseProductoDto =
       productosMapper.toResponseDto(productoEntity)
+
+    expect(actualResponseProductoDto).toBeInstanceOf(ResponseProductoDto)
 
     expect(actualResponseProductoDto.marca).toEqual(productoEntity.marca)
     expect(actualResponseProductoDto.modelo).toEqual(productoEntity.modelo)

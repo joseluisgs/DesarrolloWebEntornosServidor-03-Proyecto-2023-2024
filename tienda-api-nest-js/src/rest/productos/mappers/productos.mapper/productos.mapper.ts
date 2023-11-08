@@ -13,7 +13,9 @@ export class ProductosMapper {
     categoria: CategoriaEntity,
   ): ProductoEntity {
     const productoEntity = plainToClass(ProductoEntity, createProductoDto)
-    return { ...productoEntity, categoria, uuid: uuidv4() }
+    productoEntity.categoria = categoria
+    productoEntity.uuid = uuidv4()
+    return productoEntity
   }
 
   toResponseDto(productoEntity: ProductoEntity): ResponseProductoDto {

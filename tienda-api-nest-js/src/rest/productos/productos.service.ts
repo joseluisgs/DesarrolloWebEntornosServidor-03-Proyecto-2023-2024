@@ -11,6 +11,7 @@ import { ProductoEntity } from './entities/producto.entity'
 import { Repository } from 'typeorm'
 import { CategoriaEntity } from '../categorias/entities/categoria.entity'
 import { ProductosMapper } from './mappers/productos.mapper/productos.mapper'
+import { ResponseProductoDto } from './dto/response-producto.dto'
 
 @Injectable()
 export class ProductosService {
@@ -27,7 +28,7 @@ export class ProductosService {
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
 
-  async findAll() {
+  async findAll(): Promise<ResponseProductoDto[]> {
     this.logger.log('Find all productos')
     // No puedo usar .find, porque quiero devolver el nombre de la categoría
     // Uso leftJoinAndSelect para que me devuelva los productos con la categoría
@@ -42,7 +43,7 @@ export class ProductosService {
     )
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<ResponseProductoDto> {
     this.logger.log(`Find one producto by id:${id}`)
     // No puedo usar .findOneBy, porque quiero devolver el nombre de la categoría
     const productToFind = await this.productoRepository
@@ -58,7 +59,9 @@ export class ProductosService {
     return this.productosMapper.toResponseDto(productToFind)
   }
 
-  async create(createProductoDto: CreateProductoDto) {
+  async create(
+    createProductoDto: CreateProductoDto,
+  ): Promise<ResponseProductoDto> {
     this.logger.log('Create producto ${createProductoDto}')
     const categoria = await this.checkCategoria(createProductoDto.categoria)
     const productoToCreate = this.productosMapper.toEntity(
@@ -69,7 +72,10 @@ export class ProductosService {
     return this.productosMapper.toResponseDto(productoCreated)
   }
 
-  async update(id: number, updateProductoDto: UpdateProductoDto) {
+  async update(
+    id: number,
+    updateProductoDto: UpdateProductoDto,
+  ): Promise<ResponseProductoDto> {
     this.logger.log(`Update producto by id:${id} - ${updateProductoDto}`)
     const productToUpdate = await this.exists(id)
     let categoria: CategoriaEntity
@@ -84,29 +90,26 @@ export class ProductosService {
     return this.productosMapper.toResponseDto(productoUpdated)
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<ResponseProductoDto> {
     this.logger.log(`Remove producto by id:${id}`)
     const productToRemove = await this.exists(id)
-    return await this.productoRepository.remove(productToRemove)
+    return this.productosMapper.toResponseDto(
+      await this.productoRepository.remove(productToRemove),
+    )
   }
 
   async removeSoft(id: number) {
     this.logger.log(`Remove producto by id:${id}`)
     const productToRemove = await this.exists(id)
     productToRemove.isDeleted = true
-    return await this.productoRepository.save(productToRemove)
+    return this.productosMapper.toResponseDto(
+      await this.productoRepository.save(productToRemove),
+    )
   }
 
-  private async exists(id: number) {
-    const product = await this.productoRepository.findOneBy({ id })
-    if (!product) {
-      this.logger.log(`Producto con id ${id} no encontrado`)
-      throw new NotFoundException(`Producto con id ${id} no encontrado`)
-    }
-    return product
-  }
-
-  private async checkCategoria(nombreCategoria: string) {
+  public async checkCategoria(
+    nombreCategoria: string,
+  ): Promise<CategoriaEntity> {
     // Comprobamos si existe la categoria
     // No uso el fin por la minúscula porque no es case sensitive
     const categoria = await this.categoriaRepository
@@ -122,5 +125,14 @@ export class ProductosService {
     }
 
     return categoria
+  }
+
+  public async exists(id: number): Promise<ProductoEntity> {
+    const product = await this.productoRepository.findOneBy({ id })
+    if (!product) {
+      this.logger.log(`Producto con id ${id} no encontrado`)
+      throw new NotFoundException(`Producto con id ${id} no encontrado`)
+    }
+    return product
   }
 }

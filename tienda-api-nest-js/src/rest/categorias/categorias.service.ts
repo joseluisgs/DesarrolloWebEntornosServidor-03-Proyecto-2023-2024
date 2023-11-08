@@ -17,12 +17,12 @@ export class CategoriasService {
     private readonly categoriasMapper: CategoriasMapper,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<CategoriaEntity[]> {
     this.logger.log('Find all categorias')
     return await this.categoriaRepository.find()
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<CategoriaEntity> {
     this.logger.log(`Find one categoria by id:${id}`)
     const categoriaToFound = await this.categoriaRepository.findOneBy({ id })
     if (!categoriaToFound) {
@@ -32,7 +32,9 @@ export class CategoriasService {
     return categoriaToFound
   }
 
-  async create(createCategoriaDto: CreateCategoriaDto) {
+  async create(
+    createCategoriaDto: CreateCategoriaDto,
+  ): Promise<CategoriaEntity> {
     this.logger.log(`Create categoria ${createCategoriaDto}`)
     // Añadimos un id único a la categoría, porque no lo hemos hecho en el mapper
     const categoriaToCreate = this.categoriasMapper.toEntity(createCategoriaDto)
@@ -43,7 +45,10 @@ export class CategoriasService {
     })
   }
 
-  async update(id: string, updateCategoriaDto: UpdateCategoriaDto) {
+  async update(
+    id: string,
+    updateCategoriaDto: UpdateCategoriaDto,
+  ): Promise<CategoriaEntity> {
     this.logger.log(`Update categoria by id:${id} - ${updateCategoriaDto}`)
     const categoryToUpdated = await this.findOne(id)
     return await this.categoriaRepository.save({
@@ -53,13 +58,13 @@ export class CategoriasService {
     })
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<CategoriaEntity> {
     this.logger.log(`Remove categoria by id:${id}`)
     const categoriaToRemove = await this.findOne(id)
     return await this.categoriaRepository.remove(categoriaToRemove)
   }
 
-  async removeSoft(id: string) {
+  async removeSoft(id: string): Promise<CategoriaEntity> {
     this.logger.log(`Remove categoria soft by id:${id}`)
     const categoriaToRemove = await this.findOne(id)
     return await this.categoriaRepository.save({
