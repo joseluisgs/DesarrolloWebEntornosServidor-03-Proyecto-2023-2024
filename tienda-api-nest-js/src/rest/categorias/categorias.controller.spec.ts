@@ -10,24 +10,20 @@ describe('CategoriasController', () => {
   let controller: CategoriasController
   let service: CategoriasService
 
-  // Creamos el mock del servicio con los métodos que vamos a utilizar en el controlador
   beforeEach(async () => {
-    const mockCategoriasService = {
-      // mock completo del servicio
-      findAll: jest.fn(),
-      findOne: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      removeSoft: jest.fn(),
-    }
-
     // Creamos un módulo de prueba de NestJS que nos permitirá crear una instancia de nuestro controlador.
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CategoriasController],
       providers: [
         {
           provide: CategoriasService,
-          useValue: mockCategoriasService,
+          useValue: {
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            removeSoft: jest.fn(),
+          },
         },
       ],
     }).compile()

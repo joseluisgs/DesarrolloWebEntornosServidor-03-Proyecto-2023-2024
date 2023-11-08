@@ -1,0 +1,215 @@
+import { INestApplication } from '@nestjs/common'
+import { Test, TestingModule } from '@nestjs/testing'
+import * as request from 'supertest'
+import { getRepositoryToken } from '@nestjs/typeorm'
+import { CategoriaEntity } from '../../../src/rest/categorias/entities/categoria.entity'
+import { ProductoEntity } from '../../../src/rest/productos/entities/producto.entity'
+import { CreateProductoDto } from '../../../src/rest/productos/dto/create-producto.dto'
+import { UpdateProductoDto } from '../../../src/rest/productos/dto/update-producto.dto'
+import { ResponseProductoDto } from '../../../src/rest/productos/dto/response-producto.dto'
+import { ProductosModule } from '../../../src/rest/productos/productos.module'
+
+// https://ualmtorres.github.io/SeminarioTesting/#truetests-end-to-end
+describe('ProductosController (e2e)', () => {
+  let app: INestApplication
+  const myEndpoint = `/productos`
+
+  const myCategoria: CategoriaEntity = {
+    id: '1',
+    nombre: 'categoria-test',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isDeleted: false,
+    productos: [],
+  }
+
+  const myProducto: ProductoEntity = {
+    id: 1,
+    marca: 'marca',
+    modelo: 'modelo',
+    descripcion: 'descripcion',
+    precio: 100,
+    stock: 10,
+    imagen: 'imagen',
+    uuid: 'uuid',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isDeleted: false,
+    categoria: myCategoria,
+  }
+
+  const createProductoDto: CreateProductoDto = {
+    marca: 'marca',
+    modelo: 'modelo',
+    descripcion: 'descripcion',
+    precio: 100,
+    stock: 10,
+    imagen: 'imagen',
+    categoria: 'categoria-test',
+  }
+
+  const updateProductoDto: UpdateProductoDto = {
+    marca: 'marca',
+    isDeleted: false,
+    categoria: 'categoria-test',
+  }
+
+  const productoResponseDto: ResponseProductoDto = {
+    id: 1,
+    marca: 'marca',
+    modelo: 'modelo',
+    descripcion: 'descripcion',
+    precio: 100,
+    stock: 10,
+    imagen: 'imagen',
+    uuid: 'uuid',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isDeleted: false,
+    categoria: 'categoria',
+  }
+
+  // My mock de repository
+  const mockProductosRepository = {
+    find: jest.fn(),
+    findOneBy: jest.fn(),
+    save: jest.fn(),
+    remove: jest.fn(),
+    createQueryBuilder: jest.fn(),
+  }
+
+  const mockCategoriasRepository = {
+    createQueryBuilder: jest.fn(),
+  }
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [ProductosModule],
+    })
+      // Le decimos a Nest que inyecte nuestro mock de repositorio en lugar del repositorio real.
+      .overrideProvider(getRepositoryToken(ProductoEntity))
+      .useValue(mockProductosRepository)
+      .overrideProvider(getRepositoryToken(CategoriaEntity))
+      .useValue(mockCategoriasRepository)
+      .compile()
+
+    app = moduleFixture.createNestApplication()
+    await app.init()
+  })
+
+  afterAll(async () => {
+    await app.close()
+  })
+
+  describe('GET /productos', () => {
+    it('should return an array of productos', () => {
+      // Mock the find method
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([myProducto]),
+      }
+
+      jest
+        .spyOn(mockProductosRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      jest
+        .spyOn(mockProductosRepository, 'find')
+        .mockResolvedValueOnce([myProducto])
+
+      return request(app.getHttpServer()).get(myEndpoint).expect(200)
+    })
+  })
+
+  describe('GET /productos/:id', () => {
+    it('should return a single productos', () => {
+      // Mock the findOne method
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(), // Añade esto
+        getOne: jest.fn().mockResolvedValue(myProducto),
+      }
+
+      jest
+        .spyOn(mockProductosRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      jest
+        .spyOn(mockProductosRepository, 'findOneBy')
+        .mockResolvedValueOnce(myProducto)
+      return request(app.getHttpServer())
+        .get(`${myEndpoint}/${myProducto.id}`)
+        .expect(200)
+    })
+    it('should return a 404 if the productos does not exist', () => {
+      // Mock the findOne method
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue(null),
+      }
+
+      jest
+        .spyOn(mockProductosRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      return request(app.getHttpServer())
+        .get(`${myEndpoint}/${myProducto.id}`)
+        .expect(404)
+    })
+  })
+
+  describe('POST /productos', () => {
+    it('should create a new productos', () => {
+      // Mock the create method
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(), // Añade esto
+        getOne: jest.fn().mockResolvedValue(new CategoriaEntity()),
+      }
+
+      jest
+        .spyOn(mockCategoriasRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      jest
+        .spyOn(mockProductosRepository, 'save')
+        .mockResolvedValueOnce(myProducto)
+
+      return request(app.getHttpServer())
+        .post(myEndpoint)
+        .send(createProductoDto)
+        .expect(201)
+    })
+  })
+
+  describe('PUT /productos/:id', () => {
+    it('should update a productos', () => {
+      // Mock the update method
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(), // Añade esto
+        getOne: jest.fn().mockResolvedValue(new CategoriaEntity()),
+      }
+
+      jest
+        .spyOn(mockCategoriasRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      jest
+        .spyOn(mockProductosRepository, 'save')
+        .mockResolvedValueOnce(myProducto)
+
+      jest
+        .spyOn(mockProductosRepository, 'findOneBy')
+        .mockResolvedValueOnce(myProducto)
+
+      return request(app.getHttpServer())
+        .put(`${myEndpoint}/${myProducto.id}`)
+        .send(updateProductoDto)
+        .expect(200)
+    })
+  })
+})
