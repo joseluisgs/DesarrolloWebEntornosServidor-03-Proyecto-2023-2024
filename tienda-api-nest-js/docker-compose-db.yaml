@@ -1,0 +1,72 @@
+# Servicios de almacenamiento de datos
+# Desarrollo
+services:
+  # PostgreSQL
+  postgres-db:
+    container_name: tienda-db_postgres
+    image: postgres:12-alpine
+    restart: always
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - ./database/tienda.sql:/docker-entrypoint-initdb.d/tienda.sql
+    networks:
+      - tienda-network
+
+  # MongoDB
+  mongo-db:
+    container_name: tienda-db_mongo
+    image: mongo:5.0
+    restart: always
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - ${MONGO_PORT}:27017
+    volumes:
+      - ./database/tienda.js:/docker-entrypoint-initdb.d/tienda.js:ro
+    networks:
+      - tienda-network
+
+  # Adminer para conectarse a la base de datos
+  # Quitar en despliegue final
+  adminer-postgres-db:
+    container_name: tienda-db_adminer-postgres-db
+    image: adminer
+    restart: always
+    env_file: .env
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres-db
+    networks:
+      - tienda-network
+
+  # Mongo Express para conectarse a la base de datos
+  # Quitar en despliegue final
+  mongo-express-db:
+    container_name: tienda-db_mongo-express-db
+    image: mongo-express
+    restart: always
+    env_file: .env
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DATABASE_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DATABASE_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongo-db
+    depends_on:
+      - mongo-db
+    networks:
+      - tienda-network
+
+networks:
+  tienda-network:
+    driver: bridge
