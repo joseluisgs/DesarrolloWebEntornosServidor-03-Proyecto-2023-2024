@@ -7,11 +7,13 @@ import {
   HttpCode,
   Logger,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Put,
   Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import { ProductosService } from './productos.service'
@@ -21,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { extname, parse } from 'path'
 import { Request } from 'express'
+import { ProductoExistsGuard } from './guards/producto-id/producto-exists-guard'
 
 @Controller('productos')
 export class ProductosController {
@@ -49,7 +52,7 @@ export class ProductosController {
 
   @Put(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
     this.logger.log(`Update producto with id:${id}-${updateProductoDto}`)
@@ -58,7 +61,7 @@ export class ProductosController {
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     this.logger.log('Remove producto with id:${id}')
     // borrado fisico
     // return await this.productosService.remove(id)
@@ -67,6 +70,7 @@ export class ProductosController {
   }
 
   @Patch('/imagen/:id')
+  @UseGuards(ProductoExistsGuard) // Aplicar el guard aquí
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -105,7 +109,7 @@ export class ProductosController {
     }),
   ) // 'file' es el nombre del campo en el formulario
   updateImage(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
