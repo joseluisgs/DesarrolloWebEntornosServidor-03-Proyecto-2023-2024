@@ -2,7 +2,7 @@
   "name": "tienda-api-nest-js",
   "version": "0.0.1",
   "description": "Ejemplo de la API de tienda NestJS",
-  "author": "",
+  "author": "joseluisgs",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
