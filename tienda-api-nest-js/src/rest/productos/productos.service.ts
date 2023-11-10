@@ -14,6 +14,11 @@ import { ProductosMapper } from './mappers/productos.mapper/productos.mapper'
 import { ResponseProductoDto } from './dto/response-producto.dto'
 import { StorageService } from '../storage/storage.service'
 import { Request } from 'express'
+import { ProductsNotificationsGateway } from '../../websockets/notifications/products-notifications.gateway'
+import {
+  Notificacion,
+  NotificacionTipo,
+} from '../../websockets/notifications/models/notificacion.model'
 
 @Injectable()
 export class ProductosService {
@@ -27,6 +32,7 @@ export class ProductosService {
     private readonly categoriaRepository: Repository<CategoriaEntity>,
     private readonly productosMapper: ProductosMapper,
     private readonly storageService: StorageService,
+    private readonly productsNotificationsGateway: ProductsNotificationsGateway,
   ) {}
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
@@ -72,7 +78,9 @@ export class ProductosService {
       categoria,
     )
     const productoCreated = await this.productoRepository.save(productoToCreate)
-    return this.productosMapper.toResponseDto(productoCreated)
+    const dto = this.productosMapper.toResponseDto(productoCreated)
+    this.onChange(NotificacionTipo.CREATE, dto)
+    return dto
   }
 
   async update(
@@ -94,7 +102,9 @@ export class ProductosService {
       ...updateProductoDto,
       categoria,
     })
-    return this.productosMapper.toResponseDto(productoUpdated)
+    const dto = this.productosMapper.toResponseDto(productoUpdated)
+    this.onChange(NotificacionTipo.UPDATE, dto)
+    return dto
   }
 
   async remove(id: number): Promise<ResponseProductoDto> {
@@ -107,16 +117,19 @@ export class ProductosService {
       this.logger.log(`Borrando imagen ${productToRemove.imagen}`)
       this.storageService.removeFile(productToRemove.imagen)
     }
-    return this.productosMapper.toResponseDto(productoRemoved)
+    const dto = this.productosMapper.toResponseDto(productoRemoved)
+    this.onChange(NotificacionTipo.DELETE, dto)
+    return dto
   }
 
   async removeSoft(id: number) {
     this.logger.log(`Remove producto by id:${id}`)
     const productToRemove = await this.exists(id)
     productToRemove.isDeleted = true
-    return this.productosMapper.toResponseDto(
-      await this.productoRepository.save(productToRemove),
-    )
+    const productoRemoved = await this.productoRepository.save(productToRemove)
+    const dto = this.productosMapper.toResponseDto(productoRemoved)
+    this.onChange(NotificacionTipo.DELETE, dto)
+    return dto
   }
 
   public async checkCategoria(
@@ -193,8 +206,20 @@ export class ProductosService {
     }
 
     productToUpdate.imagen = filePath
-    return this.productosMapper.toResponseDto(
-      await this.productoRepository.save(productToUpdate),
+    const productoUpdated = await this.productoRepository.save(productToUpdate)
+    const dto = this.productosMapper.toResponseDto(productoUpdated)
+    this.onChange(NotificacionTipo.UPDATE, dto)
+    return dto
+  }
+
+  private onChange(tipo: NotificacionTipo, data: ResponseProductoDto) {
+    const notificacion = new Notificacion<ResponseProductoDto>(
+      'PRODUCTOS',
+      tipo,
+      data,
+      new Date(),
     )
+    // Lo enviamos
+    this.productsNotificationsGateway.sendMessage(notificacion)
   }
 }

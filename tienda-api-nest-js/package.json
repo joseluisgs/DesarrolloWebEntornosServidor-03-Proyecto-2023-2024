@@ -2,7 +2,7 @@
   "name": "tienda-api-nest-js",
   "version": "0.0.1",
   "description": "Ejemplo de la API de tienda NestJS",
-  "author": "",
+  "author": "joseluisgs",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -25,7 +25,9 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.2.8",
     "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/websockets": "^10.2.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "pg": "^8.11.3",
