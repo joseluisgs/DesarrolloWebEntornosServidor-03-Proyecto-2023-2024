@@ -44,12 +44,17 @@ export class StorageService {
     }
   }
 
-  getFileName(fileUrl: string): string {
-    const url = new URL(fileUrl)
-    const pathname = url.pathname // '/v1/storage/bd9e0f33-21b4-4abd-9659-069b6fcf7fb4.png'
-    const segments = pathname.split('/')
-    const filename = segments[segments.length - 1] // 'bd9e0f33-21b4-4abd-9659-069b6fcf7fb4.png'
-    return filename
+  getFileNameWithouUrl(fileUrl: string): string {
+    try {
+      const url = new URL(fileUrl)
+      const pathname = url.pathname // '/v1/storage/bd9e0f33-21b4-4abd-9659-069b6fcf7fb4.png'
+      const segments = pathname.split('/')
+      const filename = segments[segments.length - 1] // 'bd9e0f33-21b4-4abd-9659-069b6fcf7fb4.png'
+      return filename
+    } catch (error) {
+      this.logger.error(error)
+      return fileUrl
+    }
   }
 
   removeFile(filename: string): void {

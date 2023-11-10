@@ -155,11 +155,14 @@ export class ProductosService {
     // Borramos su imagen si es distinta a la imagen por defecto
     if (productToUpdate.imagen !== ProductoEntity.IMAGE_DEFAULT) {
       this.logger.log(`Borrando imagen ${productToUpdate.imagen}`)
-      const filePathWithoutUrl = this.storageService.getFileName(
-        productToUpdate.imagen,
-      )
+      let imagePath = productToUpdate.imagen
+      if (withUrl) {
+        imagePath = this.storageService.getFileNameWithouUrl(
+          productToUpdate.imagen,
+        )
+      }
       try {
-        this.storageService.removeFile(filePathWithoutUrl)
+        this.storageService.removeFile(imagePath)
       } catch (error) {
         this.logger.error(error) // No lanzamos nada si no existe!!
       }

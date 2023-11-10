@@ -4,7 +4,6 @@ import {
   Get,
   Logger,
   Param,
-  Post,
   Req,
   Res,
   UploadedFile,
@@ -23,7 +22,7 @@ export class StorageController {
 
   constructor(private readonly storageService: StorageService) {}
 
-  @Post()
+  // @Post() // no quiero que se pueda crear un fichero desde el controlador!!
   // El decorador @UseInterceptors nos permite interceptar la petición
   // y realizar acciones antes de que llegue al controlador
   // En este caso, usamos el interceptor FileInterceptor para interceptar
