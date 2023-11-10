@@ -80,15 +80,19 @@ export class ProductosService {
     updateProductoDto: UpdateProductoDto,
   ): Promise<ResponseProductoDto> {
     this.logger.log(`Update producto by id:${id} - ${updateProductoDto}`)
-    const productToUpdate = await this.exists(id)
+    const productToUpdate = await this.findOne(id)
     let categoria: CategoriaEntity
     if (updateProductoDto.categoria) {
+      // tiene categoria, comprobamos que exista
       categoria = await this.checkCategoria(updateProductoDto.categoria)
+    } else {
+      // no tiene categoria, dejamos la que tenía
+      categoria = await this.checkCategoria(productToUpdate.categoria)
     }
     const productoUpdated = await this.productoRepository.save({
       ...productToUpdate,
       ...updateProductoDto,
-      categoria: categoria ? categoria : productToUpdate.categoria,
+      categoria,
     })
     return this.productosMapper.toResponseDto(productoUpdated)
   }

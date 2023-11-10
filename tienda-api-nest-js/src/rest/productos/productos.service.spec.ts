@@ -145,6 +145,22 @@ describe('ProductosService', () => {
 
       const mockProductoEntity = new ProductoEntity()
       const mockResponseProductoDto = new ResponseProductoDto()
+      const mockCategoriaEntity = new CategoriaEntity()
+
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(), // Añade esto
+        getOne: jest.fn().mockResolvedValue(mockProductoEntity),
+      }
+
+      jest
+        .spyOn(productoRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      jest
+        .spyOn(service, 'checkCategoria')
+        .mockResolvedValue(mockCategoriaEntity)
 
       jest.spyOn(service, 'exists').mockResolvedValue(mockProductoEntity)
 

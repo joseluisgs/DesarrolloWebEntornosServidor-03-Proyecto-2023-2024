@@ -20,7 +20,7 @@ export class ProductosMapper {
 
   toResponseDto(productoEntity: ProductoEntity): ResponseProductoDto {
     const dto = plainToClass(ResponseProductoDto, productoEntity)
-    if (productoEntity.categoria) {
+    if (productoEntity.categoria && productoEntity.categoria.nombre) {
       dto.categoria = productoEntity.categoria.nombre
     } else {
       dto.categoria = null
