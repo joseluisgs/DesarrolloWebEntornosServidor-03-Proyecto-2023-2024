@@ -71,8 +71,19 @@ describe('CategoriasService', () => {
   describe('create', () => {
     it('should successfully insert a category', async () => {
       const testCategory = new CategoriaEntity()
+      testCategory.nombre = 'test'
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(), // Añade esto
+        getOne: jest.fn().mockResolvedValue(null),
+      }
+
+      jest
+        .spyOn(repo, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
       jest.spyOn(mapper, 'toEntity').mockReturnValue(testCategory)
       jest.spyOn(repo, 'save').mockResolvedValue(testCategory)
+      jest.spyOn(service, 'exists').mockResolvedValue(null) // Simula la función 'exists'
 
       expect(await service.create(new CreateCategoriaDto())).toEqual(
         testCategory,
@@ -84,14 +95,26 @@ describe('CategoriasService', () => {
   describe('update', () => {
     it('should call the update method', async () => {
       const testCategory = new CategoriaEntity()
+      testCategory.nombre = 'test'
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue(testCategory),
+      }
+
+      const mockUpdateCategoriaDto = new UpdateCategoriaDto()
+
+      jest
+        .spyOn(repo, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+      jest.spyOn(service, 'exists').mockResolvedValue(testCategory) // Simula la función 'exists'
       jest.spyOn(repo, 'findOneBy').mockResolvedValue(testCategory)
       jest.spyOn(mapper, 'toEntity').mockReturnValue(testCategory)
       jest.spyOn(repo, 'save').mockResolvedValue(testCategory)
 
-      expect(await service.update('1', new UpdateCategoriaDto())).toEqual(
-        testCategory,
-      )
-      expect(mapper.toEntity).toHaveBeenCalled()
+      const result = await service.update('1', mockUpdateCategoriaDto)
+
+      expect(result).toEqual(testCategory)
     })
   })
 

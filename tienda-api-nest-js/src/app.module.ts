@@ -3,7 +3,8 @@ import { ProductosModule } from './rest/productos/productos.module'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { CategoriasModule } from './rest/categorias/categorias.module'
-import { StorageModule } from './rest/storage/storage.module';
+import { StorageModule } from './rest/storage/storage.module'
+import { NotificationsModule } from './websockets/notifications/notifications.module'
 import * as process from 'process'
 
 @Module({
@@ -28,8 +29,8 @@ import * as process from 'process'
     ProductosModule,
     CategoriasModule,
     StorageModule,
+    NotificationsModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}
