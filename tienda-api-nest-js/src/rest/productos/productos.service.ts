@@ -151,7 +151,15 @@ export class ProductosService {
     withUrl: boolean = true,
   ) {
     this.logger.log(`Update image producto by id:${id}`)
-    const productToUpdate = await this.exists(id)
+    let productToUpdate: ProductoEntity
+    try {
+      productToUpdate = await this.exists(id)
+    } catch (error) {
+      // no existe, borramos el fichero que se acaba de subir
+      this.logger.error(error)
+      this.storageService.removeFile(file.filename)
+      throw error
+    }
     // Borramos su imagen si es distinta a la imagen por defecto
     if (productToUpdate.imagen !== ProductoEntity.IMAGE_DEFAULT) {
       this.logger.log(`Borrando imagen ${productToUpdate.imagen}`)
