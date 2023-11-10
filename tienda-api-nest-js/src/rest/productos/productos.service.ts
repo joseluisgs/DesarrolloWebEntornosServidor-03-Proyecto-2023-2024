@@ -148,7 +148,7 @@ export class ProductosService {
     id: number,
     file: Express.Multer.File,
     req: Request,
-    withUrl: boolean,
+    withUrl: boolean = true,
   ) {
     this.logger.log(`Update image producto by id:${id}`)
     const productToUpdate = await this.exists(id)
