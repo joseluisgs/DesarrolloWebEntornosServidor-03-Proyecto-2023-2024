@@ -53,6 +53,7 @@ describe('ProductosController (e2e)', () => {
     remove: jest.fn(),
     removeSoft: jest.fn(),
     updateImage: jest.fn(),
+    exists: jest.fn(),
   }
 
   beforeEach(async () => {
@@ -178,7 +179,9 @@ describe('ProductosController (e2e)', () => {
 
   describe('PATCH /productos/imagen/:id', () => {
     it('should update the product image', async () => {
-      const file = new Buffer('file')
+      const file = Buffer.from('file')
+
+      mockProductosService.exists.mockResolvedValue(true)
 
       mockProductosService.updateImage.mockResolvedValue(myProductoResponse)
 
