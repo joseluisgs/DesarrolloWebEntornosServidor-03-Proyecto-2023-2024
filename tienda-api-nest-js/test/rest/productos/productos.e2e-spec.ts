@@ -52,6 +52,7 @@ describe('ProductosController (e2e)', () => {
     update: jest.fn(),
     remove: jest.fn(),
     removeSoft: jest.fn(),
+    updateImage: jest.fn(),
   }
 
   beforeEach(async () => {
@@ -172,6 +173,22 @@ describe('ProductosController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`${myEndpoint}/${myProductoResponse.id}`)
         .expect(404)
+    })
+  })
+
+  describe('PATCH /productos/imagen/:id', () => {
+    it('should update the product image', async () => {
+      const file = new Buffer('file')
+
+      mockProductosService.updateImage.mockResolvedValue(myProductoResponse)
+
+      await request(app.getHttpServer())
+        .patch(`${myEndpoint}/imagen/${myProductoResponse.id}`)
+        .attach('file', file, 'image.jpg')
+        .set('Content-Type', 'multipart/form-data')
+        .expect(200)
+
+      // expect(mockProductosService.updateImage).toHaveBeenCalled()
     })
   })
 })
