@@ -19,8 +19,7 @@ import { CreateProductoDto } from './dto/create-producto.dto'
 import { UpdateProductoDto } from './dto/update-producto.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
-import { v4 as uuidv4 } from 'uuid'
-import { extname } from 'path'
+import { extname, parse } from 'path'
 import { Request } from 'express'
 
 @Controller('productos')
@@ -73,16 +72,32 @@ export class ProductosController {
       storage: diskStorage({
         destination: process.env.UPLOADS_DIR || './storage-dir',
         filename: (req, file, cb) => {
-          const fileName = uuidv4() // usamos uuid para generar un nombre único para el archivo
+          // const fileName = uuidv4() // usamos uuid para generar un nombre único para el archivo
+          const { name } = parse(file.originalname)
+          const fileName = `${Date.now()}_${name.replace(/\s/g, '')}`
           const fileExt = extname(file.originalname) // extraemos la extensión del archivo
           cb(null, `${fileName}${fileExt}`) // llamamos al callback con el nombre del archivo
         },
       }),
       // Validación de archivos
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+        const allowedMimes = ['image/jpeg', 'image/png', 'image/gif']
+        const maxFileSize = 1024 * 1024 // 1 megabyte
+        if (!allowedMimes.includes(file.mimetype)) {
           // Note: You can customize this error message to be more specific
-          cb(new BadRequestException('Fichero no soportado.'), false)
+          cb(
+            new BadRequestException(
+              'Fichero no soportado. No es del tipo imagen válido',
+            ),
+            false,
+          )
+        } else if (file.size > maxFileSize) {
+          cb(
+            new BadRequestException(
+              'El tamaño del archivo no puede ser mayor a 1 megabyte.',
+            ),
+            false,
+          )
         } else {
           cb(null, true)
         }
