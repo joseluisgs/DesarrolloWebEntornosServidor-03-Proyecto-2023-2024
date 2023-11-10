@@ -10,6 +10,8 @@ import { ResponseProductoDto } from './dto/response-producto.dto'
 import { CreateProductoDto } from './dto/create-producto.dto'
 import { UpdateProductoDto } from './dto/update-producto.dto'
 import { StorageService } from '../storage/storage.service'
+import { ProductsNotificationsGateway } from '../../websockets/notifications/products-notifications.gateway'
+import { NotificationsModule } from '../../websockets/notifications/notifications.module'
 
 describe('ProductosService', () => {
   let service: ProductosService // servicio
@@ -17,6 +19,7 @@ describe('ProductosService', () => {
   let categoriaRepository: Repository<CategoriaEntity> // repositorio
   let mapper: ProductosMapper // mapper
   let storageService: StorageService // servicio de almacenamiento
+  let productsNotificationsGateway: ProductsNotificationsGateway // gateway de notificaciones
 
   const productosMapperMock = {
     toEntity: jest.fn(),
@@ -28,9 +31,14 @@ describe('ProductosService', () => {
     getFileNameWithouUrl: jest.fn(),
   }
 
+  const productsNotificationsGatewayMock = {
+    sendMessage: jest.fn(),
+  }
+
   // Creamos un módulo de prueba de NestJS que nos permitirá crear una instancia de nuestro servicio.
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [NotificationsModule],
       // Proporcionamos una lista de dependencias que se inyectarán en nuestro servicio.
       providers: [
         // Inyectamos al servicio los repositorios y el mapper
@@ -39,6 +47,10 @@ describe('ProductosService', () => {
         { provide: getRepositoryToken(CategoriaEntity), useClass: Repository },
         { provide: ProductosMapper, useValue: productosMapperMock },
         { provide: StorageService, useValue: storageServiceMock },
+        {
+          provide: ProductsNotificationsGateway,
+          useValue: productsNotificationsGatewayMock,
+        },
       ],
     }).compile()
 
@@ -47,6 +59,9 @@ describe('ProductosService', () => {
     categoriaRepository = module.get(getRepositoryToken(CategoriaEntity)) // Obtenemos una instancia del repositorio de categorías
     mapper = module.get<ProductosMapper>(ProductosMapper) // Obtenemos una instancia del mapper
     storageService = module.get<StorageService>(StorageService) // Obtenemos una instancia del servicio de almacenamiento
+    productsNotificationsGateway = module.get<ProductsNotificationsGateway>(
+      ProductsNotificationsGateway,
+    ) // Obtenemos una instancia del gateway de notificaciones
   })
 
   it('should be defined', () => {

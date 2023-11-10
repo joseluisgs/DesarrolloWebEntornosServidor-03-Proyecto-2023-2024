@@ -1,9 +1,8 @@
-import {Module} from '@nestjs/common';
-import {ProductsNotificationsGateway} from './products-notifications.gateway';
+import { Module } from '@nestjs/common'
+import { ProductsNotificationsGateway } from './products-notifications.gateway'
 
 @Module({
-    providers: [ProductsNotificationsGateway],
-    exports: [ProductsNotificationsGateway],
+  providers: [ProductsNotificationsGateway],
+  exports: [ProductsNotificationsGateway],
 })
-export class NotificationsModule {
-}
+export class NotificationsModule {}
