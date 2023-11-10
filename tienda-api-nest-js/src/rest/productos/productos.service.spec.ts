@@ -9,16 +9,23 @@ import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { ResponseProductoDto } from './dto/response-producto.dto'
 import { CreateProductoDto } from './dto/create-producto.dto'
 import { UpdateProductoDto } from './dto/update-producto.dto'
+import { StorageService } from '../storage/storage.service'
 
 describe('ProductosService', () => {
   let service: ProductosService // servicio
   let productoRepository: Repository<ProductoEntity> // repositorio
   let categoriaRepository: Repository<CategoriaEntity> // repositorio
   let mapper: ProductosMapper // mapper
+  let storageService: StorageService // servicio de almacenamiento
 
   const productosMapperMock = {
     toEntity: jest.fn(),
     toResponseDto: jest.fn(),
+  }
+
+  const storageServiceMock = {
+    removeFile: jest.fn(),
+    getFileNameWithouUrl: jest.fn(),
   }
 
   // Creamos un módulo de prueba de NestJS que nos permitirá crear una instancia de nuestro servicio.
@@ -31,6 +38,7 @@ describe('ProductosService', () => {
         { provide: getRepositoryToken(ProductoEntity), useClass: Repository },
         { provide: getRepositoryToken(CategoriaEntity), useClass: Repository },
         { provide: ProductosMapper, useValue: productosMapperMock },
+        { provide: StorageService, useValue: storageServiceMock },
       ],
     }).compile()
 
@@ -38,6 +46,7 @@ describe('ProductosService', () => {
     productoRepository = module.get(getRepositoryToken(ProductoEntity)) // Obtenemos una instancia del repositorio de productos
     categoriaRepository = module.get(getRepositoryToken(CategoriaEntity)) // Obtenemos una instancia del repositorio de categorías
     mapper = module.get<ProductosMapper>(ProductosMapper) // Obtenemos una instancia del mapper
+    storageService = module.get<StorageService>(StorageService) // Obtenemos una instancia del servicio de almacenamiento
   })
 
   it('should be defined', () => {
@@ -242,6 +251,38 @@ describe('ProductosService', () => {
       await expect(service.checkCategoria(categoriaNombre)).rejects.toThrow(
         BadRequestException,
       )
+    })
+  })
+
+  describe('updateImage', () => {
+    it('should update a producto image', async () => {
+      const mockRequest = {
+        protocol: 'http',
+        get: () => 'localhost',
+      }
+      const mockFile = {
+        filename: 'new_image',
+      }
+
+      const mockProductoEntity = new ProductoEntity()
+      const mockResponseProductoDto = new ResponseProductoDto()
+
+      jest.spyOn(service, 'exists').mockResolvedValue(mockProductoEntity)
+
+      jest
+        .spyOn(productoRepository, 'save')
+        .mockResolvedValue(mockProductoEntity)
+
+      jest
+        .spyOn(mapper, 'toResponseDto')
+        .mockReturnValue(mockResponseProductoDto)
+
+      expect(
+        await service.updateImage(1, mockFile as any, mockRequest as any, true),
+      ).toEqual(mockResponseProductoDto)
+
+      expect(storageService.removeFile).toHaveBeenCalled()
+      expect(storageService.getFileNameWithouUrl).toHaveBeenCalled()
     })
   })
 })

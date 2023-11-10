@@ -6,6 +6,7 @@ import { ProductosService } from './productos.service'
 import { ResponseProductoDto } from './dto/response-producto.dto'
 import { CreateProductoDto } from './dto/create-producto.dto'
 import { UpdateProductoDto } from './dto/update-producto.dto'
+import { Request } from 'express'
 
 describe('ProductoController', () => {
   let controller: ProductosController
@@ -17,6 +18,7 @@ describe('ProductoController', () => {
     create: jest.fn(),
     update: jest.fn(),
     removeSoft: jest.fn(),
+    updateImage: jest.fn(),
   }
 
   // Creamos el mock del servicio con los métodos que vamos a utilizar en el controlador
@@ -124,6 +126,26 @@ describe('ProductoController', () => {
         .spyOn(service, 'removeSoft')
         .mockRejectedValue(new NotFoundException())
       await expect(controller.remove(id)).rejects.toThrow(NotFoundException)
+    })
+  })
+
+  describe('updateImage', () => {
+    it('should update a producto image', async () => {
+      const mockId = 1
+      const mockFile = {} as Express.Multer.File
+      const mockReq = {} as Request
+      const mockResult: ResponseProductoDto = new ResponseProductoDto()
+
+      jest.spyOn(service, 'updateImage').mockResolvedValue(mockResult)
+
+      await controller.updateImage(mockId, mockFile, mockReq)
+      expect(service.updateImage).toHaveBeenCalledWith(
+        mockId,
+        mockFile,
+        mockReq,
+        true,
+      )
+      expect(mockResult).toBeInstanceOf(ResponseProductoDto)
     })
   })
 })
