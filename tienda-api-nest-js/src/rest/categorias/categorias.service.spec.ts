@@ -10,6 +10,7 @@ import { CategoriasMapper } from './mappers/categorias.mapper/categorias.mapper'
 import { Paginated } from 'nestjs-paginate'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
+import { hash } from 'typeorm/util/StringUtils'
 
 describe('CategoriasService', () => {
   let service: CategoriasService
@@ -49,9 +50,9 @@ describe('CategoriasService', () => {
     // getRepositoryToken es una función de NestJS que se utiliza para generar un token de inyección de dependencias para un repositorio de TypeORM.
     repo = module.get<Repository<CategoriaEntity>>(
       getRepositoryToken(CategoriaEntity),
-    )
-    mapper = module.get<CategoriasMapper>(CategoriasMapper)
-    cacheManager = module.get<Cache>(CACHE_MANAGER)
+    ) // Obtenemos una instancia de nuestro repositorio de categorías.
+    mapper = module.get<CategoriasMapper>(CategoriasMapper) // Obtenemos una instancia de nuestro mapper de categorías.
+    cacheManager = module.get<Cache>(CACHE_MANAGER) // Obtenemos una instancia del caché
   })
 
   it('should be defined', () => {
@@ -147,7 +148,7 @@ describe('CategoriasService', () => {
 
       // Expect the cacheManager.get method to be called with the correct key
       expect(cacheManager.get).toHaveBeenCalledWith(
-        `all_categories_page_${paginateOptions.page}`,
+        `all_categories_page_${hash(JSON.stringify(paginateOptions))}`,
       )
 
       // Expect the result to be the cached result

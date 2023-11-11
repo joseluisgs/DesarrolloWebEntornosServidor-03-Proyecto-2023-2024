@@ -20,6 +20,7 @@ import {
   paginate,
   PaginateQuery,
 } from 'nestjs-paginate'
+import { hash } from 'typeorm/util/StringUtils'
 
 @Injectable()
 export class CategoriasService {
@@ -36,7 +37,7 @@ export class CategoriasService {
     this.logger.log('Find all categorias')
     // cache
     const cache = await this.cacheManager.get(
-      `all_categories_page_${query.page}`,
+      `all_categories_page_${hash(JSON.stringify(query))}`,
     )
     if (cache) {
       this.logger.log('Cache hit')
@@ -52,7 +53,12 @@ export class CategoriasService {
       },
       // select: ['id', 'nombre', 'isDeleted', 'createdAt', 'updatedAt'],
     })
-    await this.cacheManager.set(`all_categories_page_${query.page}`, res, 60)
+    //console.log(res)
+    await this.cacheManager.set(
+      `all_categories_page_${hash(JSON.stringify(query))}`,
+      res,
+      60,
+    )
     return res
   }
 

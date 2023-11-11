@@ -8,7 +8,6 @@ import { CreateProductoDto } from './dto/create-producto.dto'
 import { UpdateProductoDto } from './dto/update-producto.dto'
 import { Request } from 'express'
 import { Paginated } from 'nestjs-paginate'
-import { CategoriaEntity } from '../categorias/entities/categoria.entity'
 import { CacheModule } from '@nestjs/cache-manager'
 
 describe('ProductoController', () => {
@@ -62,7 +61,7 @@ describe('ProductoController', () => {
         links: {
           current: 'productos?page=1&limit=10&sortBy=nombre:ASC',
         },
-      } as Paginated<CategoriaEntity>
+      } as Paginated<ResponseProductoDto>
 
       jest.spyOn(service, 'findAll').mockResolvedValue(testProductos)
       const result: any = await controller.findAll(paginateOptions)

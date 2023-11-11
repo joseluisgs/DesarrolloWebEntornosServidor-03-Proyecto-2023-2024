@@ -28,6 +28,7 @@ import {
   paginate,
   PaginateQuery,
 } from 'nestjs-paginate'
+import { hash } from 'typeorm/util/StringUtils'
 
 @Injectable()
 export class ProductosService {
@@ -50,7 +51,9 @@ export class ProductosService {
   async findAll(query: PaginateQuery) {
     this.logger.log('Find all productos')
     // check cache
-    const cache = await this.cacheManager.get(`all_products_page_${query.page}`)
+    const cache = await this.cacheManager.get(
+      `all_products_page_${hash(JSON.stringify(query))}`,
+    )
     if (cache) {
       this.logger.log('Cache hit')
       return cache
@@ -76,11 +79,12 @@ export class ProductosService {
       //select: ['id', 'marca', 'modelo', 'descripcion', 'precio', 'stock'],
     })
 
-    console.log(pagination.data)
+    // console.log(pagination)
 
     // mapeamos los elementos de la pagina para devolverlos como queremos con la categoria
+    // pero debe existir la propiodad y no se indefinido, si no es un []
     const res = {
-      data: pagination.data.map((product) =>
+      data: (pagination.data ?? []).map((product) =>
         this.productosMapper.toResponseDto(product),
       ),
       meta: pagination.meta,
@@ -88,7 +92,11 @@ export class ProductosService {
     }
 
     // Guardamos en caché
-    await this.cacheManager.set(`all_products_page_${query.page}`, res, 60)
+    await this.cacheManager.set(
+      `all_products_page_${hash(JSON.stringify(query))}`,
+      res,
+      60,
+    )
     return res
   }
 
