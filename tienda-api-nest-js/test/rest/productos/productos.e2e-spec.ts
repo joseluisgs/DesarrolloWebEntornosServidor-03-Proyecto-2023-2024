@@ -6,6 +6,7 @@ import { UpdateProductoDto } from '../../../src/rest/productos/dto/update-produc
 import { ProductosController } from '../../../src/rest/productos/productos.controller'
 import { ProductosService } from '../../../src/rest/productos/productos.service'
 import { ResponseProductoDto } from '../../../src/rest/productos/dto/response-producto.dto'
+import { CacheModule } from '@nestjs/cache-manager'
 
 // https://ualmtorres.github.io/SeminarioTesting/#truetests-end-to-end
 // https://blog.logrocket.com/end-end-testing-nestjs-typeorm/  <--- MUY BUENO
@@ -60,6 +61,7 @@ describe('ProductosController (e2e)', () => {
     // Cargamos solo el controlador y el servicio que vamos a probar, no el módulo que arrastra con todo
     // No es de integración si no e2e, con mocks
     const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()], // importamos el módulo de caché, lo necesita el controlador (interceptores y anotaciones)
       controllers: [ProductosController],
       providers: [
         ProductosService,
@@ -81,12 +83,25 @@ describe('ProductosController (e2e)', () => {
   })
 
   describe('GET /productos', () => {
-    it('should return an array of productos', async () => {
+    it('should return a page of productos', async () => {
       // Configurar el mock para devolver un resultado específico
       mockProductosService.findAll.mockResolvedValue([myProductoResponse])
 
       const { body } = await request(app.getHttpServer())
         .get(myEndpoint)
+        .expect(200)
+      expect(() => {
+        expect(body).toEqual([myProductoResponse])
+        expect(mockProductosService.findAll).toHaveBeenCalled()
+      })
+    })
+
+    it('should return a page of productos with query', async () => {
+      // Configurar el mock para devolver un resultado específico
+      mockProductosService.findAll.mockResolvedValue([myProductoResponse])
+
+      const { body } = await request(app.getHttpServer())
+        .get(`${myEndpoint}?page=1&limit=10`)
         .expect(200)
       expect(() => {
         expect(body).toEqual([myProductoResponse])

@@ -35,8 +35,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:3000/v1/categorias?nombre=COM&page=1&size=1",
-							"protocol": "https",
+							"raw": "http://localhost:3000/v1/categorias?limit=1&page=1&sortBy=nombre:ASC&filter.isDeleted=$eq:false&search=I",
+							"protocol": "http",
 							"host": [
 								"localhost"
 							],
@@ -47,21 +47,24 @@
 							],
 							"query": [
 								{
-									"key": "nombre",
-									"value": "COM"
-								},
-								{
-									"key": "isDeleted",
-									"value": "true",
-									"disabled": true
+									"key": "limit",
+									"value": "1"
 								},
 								{
 									"key": "page",
 									"value": "1"
 								},
 								{
-									"key": "size",
-									"value": "1"
+									"key": "sortBy",
+									"value": "nombre:ASC"
+								},
+								{
+									"key": "filter.isDeleted",
+									"value": "$eq:false"
+								},
+								{
+									"key": "search",
+									"value": "I"
 								}
 							]
 						}
@@ -220,7 +223,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:3000/v1/productos?marca=ni&categoria=depo&isDeleted=false&precioMax=300&stockMin=6&page=1&size=1&sortBy=id&direction=desc",
+							"raw": "http://localhost:3000/v1/productos?limit=1&page=1&sortBy=marca:ASC&filter.isDeleted=$eq:false&search=das",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -232,40 +235,24 @@
 							],
 							"query": [
 								{
-									"key": "marca",
-									"value": "ni"
-								},
-								{
-									"key": "categoria",
-									"value": "depo"
-								},
-								{
-									"key": "isDeleted",
-									"value": "false"
-								},
-								{
-									"key": "precioMax",
-									"value": "300"
-								},
-								{
-									"key": "stockMin",
-									"value": "6"
+									"key": "limit",
+									"value": "1"
 								},
 								{
 									"key": "page",
 									"value": "1"
 								},
 								{
-									"key": "size",
-									"value": "1"
-								},
-								{
 									"key": "sortBy",
-									"value": "id"
+									"value": "marca:ASC"
 								},
 								{
-									"key": "direction",
-									"value": "desc"
+									"key": "filter.isDeleted",
+									"value": "$eq:false"
+								},
+								{
+									"key": "search",
+									"value": "das"
 								}
 							]
 						}

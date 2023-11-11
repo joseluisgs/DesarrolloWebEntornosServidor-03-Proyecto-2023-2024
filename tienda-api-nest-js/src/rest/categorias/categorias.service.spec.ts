@@ -7,15 +7,28 @@ import { CreateCategoriaDto } from './dto/create-categoria.dto'
 import { UpdateCategoriaDto } from './dto/update-categoria.dto'
 import { NotFoundException } from '@nestjs/common'
 import { CategoriasMapper } from './mappers/categorias.mapper/categorias.mapper'
+import { Paginated } from 'nestjs-paginate'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { Cache } from 'cache-manager'
+import { hash } from 'typeorm/util/StringUtils'
 
 describe('CategoriasService', () => {
   let service: CategoriasService
   let repo: Repository<CategoriaEntity>
   let mapper: CategoriasMapper
+  let cacheManager: Cache
 
   // Creamos un mock de nuestro mapper de categorías.
   const categoriasMapperMock = {
     toEntity: jest.fn(),
+  }
+
+  const cacheManagerMock = {
+    get: jest.fn(() => Promise.resolve()),
+    set: jest.fn(() => Promise.resolve()),
+    store: {
+      keys: jest.fn(),
+    },
   }
 
   beforeEach(async () => {
@@ -29,6 +42,7 @@ describe('CategoriasService', () => {
           provide: getRepositoryToken(CategoriaEntity), // Obtenemos el token de la entidad CategoriaEntity para inyectarlo en el servicio.
           useClass: Repository, // Creamos una instancia de la clase Repository para inyectarla en el servicio
         },
+        { provide: CACHE_MANAGER, useValue: cacheManagerMock },
       ],
     }).compile() // Compilamos el módulo de prueba.
 
@@ -36,8 +50,9 @@ describe('CategoriasService', () => {
     // getRepositoryToken es una función de NestJS que se utiliza para generar un token de inyección de dependencias para un repositorio de TypeORM.
     repo = module.get<Repository<CategoriaEntity>>(
       getRepositoryToken(CategoriaEntity),
-    )
-    mapper = module.get<CategoriasMapper>(CategoriasMapper)
+    ) // Obtenemos una instancia de nuestro repositorio de categorías.
+    mapper = module.get<CategoriasMapper>(CategoriasMapper) // Obtenemos una instancia de nuestro mapper de categorías.
+    cacheManager = module.get<Cache>(CACHE_MANAGER) // Obtenemos una instancia del caché
   })
 
   it('should be defined', () => {
@@ -45,20 +60,111 @@ describe('CategoriasService', () => {
   })
 
   describe('findAll', () => {
-    it('should return all categories', async () => {
-      // Assert that all categories
-      const testCategories = [new CategoriaEntity()]
-      // Mock the find method
-      jest.spyOn(repo, 'find').mockResolvedValue(testCategories)
-      // expect that the service will return all categories
-      expect(await service.findAll()).toEqual(testCategories)
+    it('should return a page of categories', async () => {
+      // Mock the cacheManager.get method to return null
+
+      // Create a mock PaginateQuery object
+      const paginateOptions = {
+        page: 1,
+        limit: 10,
+        path: 'categorias',
+      }
+
+      // Mock the paginate method to return a Paginated object
+      const testCategories = {
+        data: [],
+        meta: {
+          itemsPerPage: 10,
+          totalItems: 1,
+          currentPage: 1,
+          totalPages: 1,
+        },
+        links: {
+          current: 'categorias?page=1&limit=10&sortBy=nombre:ASC',
+        },
+      } as Paginated<CategoriaEntity>
+
+      jest.spyOn(cacheManager, 'get').mockResolvedValue(Promise.resolve(null))
+
+      // Mock the cacheManager.set method
+      jest.spyOn(cacheManager, 'set').mockResolvedValue()
+
+      // Debemos simular la consulta
+      const mockQueryBuilder = {
+        take: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([testCategories, 1]),
+      }
+
+      jest
+        .spyOn(repo, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any)
+
+      // Call the findAll method
+      const result: any = await service.findAll(paginateOptions)
+
+      // console.log(result)
+      expect(result.meta.itemsPerPage).toEqual(paginateOptions.limit)
+      // Expect the result to have the correct currentPage
+      expect(result.meta.currentPage).toEqual(paginateOptions.page)
+      // Expect the result to have the correct totalPages
+      expect(result.meta.totalPages).toEqual(1) // You may need to adjust this value based on your test case
+      // Expect the result to have the correct current link
+      expect(result.links.current).toEqual(
+        `categorias?page=${paginateOptions.page}&limit=${paginateOptions.limit}&sortBy=nombre:ASC`,
+      )
+      expect(cacheManager.get).toHaveBeenCalled()
+      expect(cacheManager.set).toHaveBeenCalled()
+    })
+
+    it('should return cached result', async () => {
+      // Create a mock PaginateQuery object
+      const paginateOptions = {
+        page: 1,
+        limit: 10,
+        path: 'categorias',
+      }
+
+      // Mock the paginate method to return a Paginated object
+      const testCategories = {
+        data: [],
+        meta: {
+          itemsPerPage: 10,
+          totalItems: 1,
+          currentPage: 1,
+          totalPages: 1,
+        },
+        links: {
+          current: 'categorias?page=1&limit=10&sortBy=nombre:ASC',
+        },
+      } as Paginated<CategoriaEntity>
+
+      // Mock the cacheManager.get method to return a cached result
+      jest.spyOn(cacheManager, 'get').mockResolvedValue(testCategories)
+
+      // Call the findAll method
+      const result = await service.findAll(paginateOptions)
+
+      // Expect the cacheManager.get method to be called with the correct key
+      expect(cacheManager.get).toHaveBeenCalledWith(
+        `all_categories_page_${hash(JSON.stringify(paginateOptions))}`,
+      )
+
+      // Expect the result to be the cached result
+      expect(result).toEqual(testCategories)
     })
   })
 
   describe('findOne', () => {
     it('should return a single category', async () => {
       const testCategory = new CategoriaEntity()
+      jest.spyOn(cacheManager, 'get').mockResolvedValue(Promise.resolve(null))
+
       jest.spyOn(repo, 'findOneBy').mockResolvedValue(testCategory)
+
+      jest.spyOn(cacheManager, 'set').mockResolvedValue()
+
       expect(await service.findOne('1')).toEqual(testCategory)
     })
 
@@ -84,6 +190,8 @@ describe('CategoriasService', () => {
       jest.spyOn(mapper, 'toEntity').mockReturnValue(testCategory)
       jest.spyOn(repo, 'save').mockResolvedValue(testCategory)
       jest.spyOn(service, 'exists').mockResolvedValue(null) // Simula la función 'exists'
+
+      jest.spyOn(cacheManager.store, 'keys').mockResolvedValue([])
 
       expect(await service.create(new CreateCategoriaDto())).toEqual(
         testCategory,

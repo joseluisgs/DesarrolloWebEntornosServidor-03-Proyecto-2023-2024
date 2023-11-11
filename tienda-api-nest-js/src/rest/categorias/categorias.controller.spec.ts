@@ -5,6 +5,8 @@ import { CategoriaEntity } from './entities/categoria.entity'
 import { NotFoundException } from '@nestjs/common'
 import { UpdateCategoriaDto } from './dto/update-categoria.dto'
 import { CreateCategoriaDto } from './dto/create-categoria.dto'
+import { Paginated } from 'nestjs-paginate'
+import { CacheModule } from '@nestjs/cache-manager'
 
 describe('CategoriasController', () => {
   let controller: CategoriasController
@@ -22,6 +24,7 @@ describe('CategoriasController', () => {
   beforeEach(async () => {
     // Creamos un módulo de prueba de NestJS que nos permitirá crear una instancia de nuestro controlador.
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()], // importamos el módulo de caché, lo necesita el controlador (interceptores y anotaciones)
       controllers: [CategoriasController],
       providers: [
         { provide: CategoriasService, useValue: mockCategoriaService },
@@ -38,11 +41,38 @@ describe('CategoriasController', () => {
 
   describe('findAll', () => {
     it('should get all categorias', async () => {
-      const mockResult: Array<CategoriaEntity> = []
-      jest.spyOn(service, 'findAll').mockResolvedValue(mockResult)
-      const result = await controller.findAll()
+      const paginateOptions = {
+        page: 1,
+        limit: 10,
+        path: 'categorias',
+      }
+
+      const testCategories = {
+        data: [],
+        meta: {
+          itemsPerPage: 10,
+          totalItems: 1,
+          currentPage: 1,
+          totalPages: 1,
+        },
+        links: {
+          current: 'categorias?page=1&limit=10&sortBy=nombre:ASC',
+        },
+      } as Paginated<CategoriaEntity>
+      jest.spyOn(service, 'findAll').mockResolvedValue(testCategories)
+      const result: any = await controller.findAll(paginateOptions)
+
+      // console.log(result)
+      expect(result.meta.itemsPerPage).toEqual(paginateOptions.limit)
+      // Expect the result to have the correct currentPage
+      expect(result.meta.currentPage).toEqual(paginateOptions.page)
+      // Expect the result to have the correct totalPages
+      expect(result.meta.totalPages).toEqual(1) // You may need to adjust this value based on your test case
+      // Expect the result to have the correct current link
+      expect(result.links.current).toEqual(
+        `categorias?page=${paginateOptions.page}&limit=${paginateOptions.limit}&sortBy=nombre:ASC`,
+      )
       expect(service.findAll).toHaveBeenCalled()
-      expect(result).toBeInstanceOf(Array)
     })
   })
 

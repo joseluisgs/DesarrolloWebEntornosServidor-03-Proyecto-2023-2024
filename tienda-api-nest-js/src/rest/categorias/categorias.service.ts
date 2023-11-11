@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -11,6 +12,15 @@ import { CategoriaEntity } from './entities/categoria.entity'
 import { Repository } from 'typeorm'
 import { CategoriasMapper } from './mappers/categorias.mapper/categorias.mapper'
 import { v4 as uuidv4 } from 'uuid'
+import { Cache } from 'cache-manager'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import {
+  FilterOperator,
+  FilterSuffix,
+  paginate,
+  PaginateQuery,
+} from 'nestjs-paginate'
+import { hash } from 'typeorm/util/StringUtils'
 
 @Injectable()
 export class CategoriasService {
@@ -20,20 +30,53 @@ export class CategoriasService {
     @InjectRepository(CategoriaEntity)
     private readonly categoriaRepository: Repository<CategoriaEntity>,
     private readonly categoriasMapper: CategoriasMapper,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async findAll(): Promise<CategoriaEntity[]> {
+  async findAll(query: PaginateQuery) {
     this.logger.log('Find all categorias')
-    return await this.categoriaRepository.find()
+    // cache
+    const cache = await this.cacheManager.get(
+      `all_categories_page_${hash(JSON.stringify(query))}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
+    const res = await paginate(query, this.categoriaRepository, {
+      sortableColumns: ['nombre'],
+      defaultSortBy: [['nombre', 'ASC']],
+      searchableColumns: ['nombre'],
+      filterableColumns: {
+        nombre: [FilterOperator.EQ, FilterSuffix.NOT],
+        isDeleted: [FilterOperator.EQ, FilterSuffix.NOT],
+      },
+      // select: ['id', 'nombre', 'isDeleted', 'createdAt', 'updatedAt'],
+    })
+    //console.log(res)
+    await this.cacheManager.set(
+      `all_categories_page_${hash(JSON.stringify(query))}`,
+      res,
+      60,
+    )
+    return res
   }
 
   async findOne(id: string): Promise<CategoriaEntity> {
     this.logger.log(`Find one categoria by id:${id}`)
+    // cache
+    const cache: CategoriaEntity = await this.cacheManager.get(`category_${id}`)
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     const categoriaToFound = await this.categoriaRepository.findOneBy({ id })
     if (!categoriaToFound) {
       this.logger.log(`Categoria with id:${id} not found`)
       throw new NotFoundException(`Categoria con id ${id} no encontrada`)
     }
+    // Guardamos en cache
+    await this.cacheManager.set(`category_${id}`, categoriaToFound, 60)
     return categoriaToFound
   }
 
@@ -52,11 +95,15 @@ export class CategoriasService {
         `La categoria con nombre ${categoria.nombre} ya existe`,
       )
     }
+
     // Añadimos los metadatos de uuid, createdAt y updatedAt
-    return await this.categoriaRepository.save({
+    const res = await this.categoriaRepository.save({
       ...categoriaToCreate,
       id: uuidv4(),
     })
+    // Invalidamos la cache
+    await this.invalidateCacheKey('all_categories')
+    return res
   }
 
   async update(
@@ -80,29 +127,49 @@ export class CategoriasService {
       }
     }
 
-    return await this.categoriaRepository.save({
+    const res = await this.categoriaRepository.save({
       ...categoryToUpdated,
       ...updateCategoriaDto,
     })
+    // Invalidamos la cache
+    await this.invalidateCacheKey(`category_${id}`)
+    await this.invalidateCacheKey('all_categories')
+    return res
   }
 
   async remove(id: string): Promise<CategoriaEntity> {
     this.logger.log(`Remove categoria by id:${id}`)
     const categoriaToRemove = await this.findOne(id)
-    return await this.categoriaRepository.remove(categoriaToRemove)
+    const res = await this.categoriaRepository.remove(categoriaToRemove)
+    // Invalidamos la cache
+    await this.invalidateCacheKey(`category_${id}`)
+    await this.invalidateCacheKey('all_categories')
+    return res
   }
 
   async removeSoft(id: string): Promise<CategoriaEntity> {
     this.logger.log(`Remove categoria soft by id:${id}`)
     const categoriaToRemove = await this.findOne(id)
-    return await this.categoriaRepository.save({
+    const res = await this.categoriaRepository.save({
       ...categoriaToRemove,
       updatedAt: new Date(),
       isDeleted: true,
     })
+    // Invalidamos la cache
+    await this.invalidateCacheKey(`category_${id}`)
+    await this.invalidateCacheKey('all_categories')
+    return res
   }
 
   public async exists(nombreCategoria: string): Promise<CategoriaEntity> {
+    // Cache
+    const cache: CategoriaEntity = await this.cacheManager.get(
+      `category_name_${nombreCategoria}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     // Comprobamos si existe la categoria
     // No uso el fin por la minúscula porque no es case sensitive
     const categoria = await this.categoriaRepository
@@ -111,6 +178,18 @@ export class CategoriasService {
         nombre: nombreCategoria.toLowerCase(),
       })
       .getOne()
-    return categoria
+    // Guardamos en caché
+    await this.cacheManager.set(
+      `category_name_${nombreCategoria}`,
+      categoria,
+      60,
+    )
+  }
+
+  async invalidateCacheKey(keyPattern: string): Promise<void> {
+    const cacheKeys = await this.cacheManager.store.keys()
+    const keysToDelete = cacheKeys.filter((key) => key.startsWith(keyPattern))
+    const promises = keysToDelete.map((key) => this.cacheManager.del(key))
+    await Promise.all(promises)
   }
 }

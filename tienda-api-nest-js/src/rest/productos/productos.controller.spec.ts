@@ -7,6 +7,8 @@ import { ResponseProductoDto } from './dto/response-producto.dto'
 import { CreateProductoDto } from './dto/create-producto.dto'
 import { UpdateProductoDto } from './dto/update-producto.dto'
 import { Request } from 'express'
+import { Paginated } from 'nestjs-paginate'
+import { CacheModule } from '@nestjs/cache-manager'
 
 describe('ProductoController', () => {
   let controller: ProductosController
@@ -25,6 +27,7 @@ describe('ProductoController', () => {
   beforeEach(async () => {
     // Creamos un módulo de prueba de NestJS que nos permitirá crear una instancia de nuestro controlador.
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()], // importamos el módulo de caché, lo necesita el controlador (interceptores y anotaciones)
       controllers: [ProductosController],
       providers: [
         { provide: ProductosService, useValue: productosServiceMock },
@@ -41,11 +44,39 @@ describe('ProductoController', () => {
 
   describe('findAll', () => {
     it('should get all Productos', async () => {
-      const mockResult: Array<ResponseProductoDto> = []
-      jest.spyOn(service, 'findAll').mockResolvedValue(mockResult)
-      const result = await controller.findAll()
+      const paginateOptions = {
+        page: 1,
+        limit: 10,
+        path: 'productos',
+      }
+
+      const testProductos = {
+        data: [],
+        meta: {
+          itemsPerPage: 10,
+          totalItems: 1,
+          currentPage: 1,
+          totalPages: 1,
+        },
+        links: {
+          current: 'productos?page=1&limit=10&sortBy=nombre:ASC',
+        },
+      } as Paginated<ResponseProductoDto>
+
+      jest.spyOn(service, 'findAll').mockResolvedValue(testProductos)
+      const result: any = await controller.findAll(paginateOptions)
+
+      // console.log(result)
+      expect(result.meta.itemsPerPage).toEqual(paginateOptions.limit)
+      // Expect the result to have the correct currentPage
+      expect(result.meta.currentPage).toEqual(paginateOptions.page)
+      // Expect the result to have the correct totalPages
+      expect(result.meta.totalPages).toEqual(1) // You may need to adjust this value based on your test case
+      // Expect the result to have the correct current link
+      expect(result.links.current).toEqual(
+        `productos?page=${paginateOptions.page}&limit=${paginateOptions.limit}&sortBy=nombre:ASC`,
+      )
       expect(service.findAll).toHaveBeenCalled()
-      expect(result).toBeInstanceOf(Array)
     })
   })
 
