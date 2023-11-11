@@ -84,7 +84,7 @@ describe('ProductosService', () => {
   })
 
   describe('findAll', () => {
-    it('should return an array of productos', async () => {
+    it('should return a page of products', async () => {
       // Create a mock PaginateQuery object
       const paginateOptions = {
         page: 1,

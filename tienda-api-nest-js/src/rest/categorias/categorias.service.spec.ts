@@ -60,7 +60,7 @@ describe('CategoriasService', () => {
   })
 
   describe('findAll', () => {
-    it('should return all categories', async () => {
+    it('should return a page of categories', async () => {
       // Mock the cacheManager.get method to return null
 
       // Create a mock PaginateQuery object
