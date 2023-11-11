@@ -25,6 +25,7 @@ import { extname, parse } from 'path'
 import { Request } from 'express'
 import { ProductoExistsGuard } from './guards/producto-id/producto-exists-guard'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
 
 @Controller('productos')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
@@ -36,9 +37,9 @@ export class ProductosController {
   @Get()
   @CacheKey('all_products')
   @CacheTTL(30)
-  async findAll() {
+  async findAll(@Paginate() query: PaginateQuery) {
     this.logger.log('Find all productos')
-    return await this.productosService.findAll()
+    return await this.productosService.findAll(query)
   }
 
   @Get(':id')

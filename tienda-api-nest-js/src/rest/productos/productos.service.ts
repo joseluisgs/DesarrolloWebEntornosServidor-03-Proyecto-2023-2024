@@ -22,6 +22,12 @@ import {
 } from '../../websockets/notifications/models/notificacion.model'
 import { Cache } from 'cache-manager'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import {
+  FilterOperator,
+  FilterSuffix,
+  paginate,
+  PaginateQuery,
+} from 'nestjs-paginate'
 
 @Injectable()
 export class ProductosService {
@@ -41,28 +47,48 @@ export class ProductosService {
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
 
-  async findAll(): Promise<ResponseProductoDto[]> {
+  async findAll(query: PaginateQuery) {
     this.logger.log('Find all productos')
-    // cache
-    const cache: ResponseProductoDto[] =
-      await this.cacheManager.get('all_products')
+    // check cache
+    const cache = await this.cacheManager.get(`all_products_page_${query.page}`)
     if (cache) {
       this.logger.log('Cache hit')
       return cache
     }
-    // No puedo usar .find, porque quiero devolver el nombre de la categoría
-    // Uso leftJoinAndSelect para que me devuelva los productos con la categoría
-    const productos = await this.productoRepository
+
+    // Creo el queryBuilder para poder hacer el leftJoinAndSelect con la categoría
+    const queryBuilder = this.productoRepository
       .createQueryBuilder('producto')
       .leftJoinAndSelect('producto.categoria', 'categoria')
-      .orderBy('producto.id', 'ASC')
-      .getMany()
 
-    const res = productos.map((producto) =>
-      this.productosMapper.toResponseDto(producto),
-    )
+    const pagination = await paginate(query, queryBuilder, {
+      sortableColumns: ['marca', 'modelo', 'descripcion', 'precio', 'stock'],
+      defaultSortBy: [['id', 'ASC']],
+      searchableColumns: ['marca', 'modelo', 'descripcion', 'precio', 'stock'],
+      filterableColumns: {
+        marca: [FilterOperator.EQ, FilterSuffix.NOT],
+        modelo: [FilterOperator.EQ, FilterSuffix.NOT],
+        descripcion: [FilterOperator.EQ, FilterSuffix.NOT],
+        precio: true,
+        stock: true,
+        isDeleted: [FilterOperator.EQ, FilterSuffix.NOT],
+      },
+      //select: ['id', 'marca', 'modelo', 'descripcion', 'precio', 'stock'],
+    })
+
+    console.log(pagination.data)
+
+    // mapeamos los elementos de la pagina para devolverlos como queremos con la categoria
+    const res = {
+      data: pagination.data.map((product) =>
+        this.productosMapper.toResponseDto(product),
+      ),
+      meta: pagination.meta,
+      links: pagination.links,
+    }
+
     // Guardamos en caché
-    await this.cacheManager.set('all_products', res, 60)
+    await this.cacheManager.set(`all_products_page_${query.page}`, res, 60)
     return res
   }
 
@@ -268,8 +294,11 @@ export class ProductosService {
     return dto
   }
 
-  async invalidateCacheKey(key: string): Promise<void> {
-    await this.cacheManager.del(key)
+  async invalidateCacheKey(keyPattern: string): Promise<void> {
+    const cacheKeys = await this.cacheManager.store.keys()
+    const keysToDelete = cacheKeys.filter((key) => key.startsWith(keyPattern))
+    const promises = keysToDelete.map((key) => this.cacheManager.del(key))
+    await Promise.all(promises)
   }
 
   private onChange(tipo: NotificacionTipo, data: ResponseProductoDto) {

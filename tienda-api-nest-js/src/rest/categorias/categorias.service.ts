@@ -50,9 +50,9 @@ export class CategoriasService {
         nombre: [FilterOperator.EQ, FilterSuffix.NOT],
         isDeleted: [FilterOperator.EQ, FilterSuffix.NOT],
       },
-      select: ['id', 'nombre', 'isDeleted', 'createdAt', 'updatedAt'],
+      // select: ['id', 'nombre', 'isDeleted', 'createdAt', 'updatedAt'],
     })
-    await this.cacheManager.set('all_categories', res, 60)
+    await this.cacheManager.set(`all_categories_page_${query.page}`, res, 60)
     return res
   }
 
