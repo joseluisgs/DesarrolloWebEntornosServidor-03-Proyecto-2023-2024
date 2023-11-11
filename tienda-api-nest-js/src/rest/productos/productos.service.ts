@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Get,
   Inject,
   Injectable,
   Logger,
@@ -21,7 +22,7 @@ import {
   NotificacionTipo,
 } from '../../websockets/notifications/models/notificacion.model'
 import { Cache } from 'cache-manager'
-import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 
 @Injectable()
 export class ProductosService {
@@ -41,6 +42,9 @@ export class ProductosService {
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
 
+  @Get()
+  @CacheKey('all_products')
+  @CacheTTL(30)
   async findAll(): Promise<ResponseProductoDto[]> {
     this.logger.log('Find all productos')
     // No puedo usar .find, porque quiero devolver el nombre de la categoría
@@ -56,6 +60,8 @@ export class ProductosService {
     )
   }
 
+  @CacheKey('product_')
+  @CacheTTL(30)
   async findOne(id: number): Promise<ResponseProductoDto> {
     this.logger.log(`Find one producto by id:${id}`)
     // No puedo usar .findOneBy, porque quiero devolver el nombre de la categoría
@@ -84,6 +90,7 @@ export class ProductosService {
     const productoCreated = await this.productoRepository.save(productoToCreate)
     const dto = this.productosMapper.toResponseDto(productoCreated)
     this.onChange(NotificacionTipo.CREATE, dto)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
@@ -108,6 +115,9 @@ export class ProductosService {
     })
     const dto = this.productosMapper.toResponseDto(productoUpdated)
     this.onChange(NotificacionTipo.UPDATE, dto)
+    // Invalida la caché del producto específico y 'product_all' cuando se actualiza un producto
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
@@ -123,6 +133,8 @@ export class ProductosService {
     }
     const dto = this.productosMapper.toResponseDto(productoRemoved)
     this.onChange(NotificacionTipo.DELETE, dto)
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
@@ -133,9 +145,13 @@ export class ProductosService {
     const productoRemoved = await this.productoRepository.save(productToRemove)
     const dto = this.productosMapper.toResponseDto(productoRemoved)
     this.onChange(NotificacionTipo.DELETE, dto)
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
+  @CacheKey('categoria_')
+  @CacheTTL(30)
   public async checkCategoria(
     nombreCategoria: string,
   ): Promise<CategoriaEntity> {
@@ -156,6 +172,8 @@ export class ProductosService {
     return categoria
   }
 
+  @CacheKey('product_')
+  @CacheTTL(30)
   public async exists(id: number): Promise<ProductoEntity> {
     const product = await this.productoRepository.findOneBy({ id })
     if (!product) {
@@ -213,6 +231,8 @@ export class ProductosService {
     const productoUpdated = await this.productoRepository.save(productToUpdate)
     const dto = this.productosMapper.toResponseDto(productoUpdated)
     this.onChange(NotificacionTipo.UPDATE, dto)
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
