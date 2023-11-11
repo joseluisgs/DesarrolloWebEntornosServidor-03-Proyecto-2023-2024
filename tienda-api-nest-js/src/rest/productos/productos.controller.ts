@@ -24,17 +24,22 @@ import { diskStorage } from 'multer'
 import { extname, parse } from 'path'
 import { Request } from 'express'
 import { ProductoExistsGuard } from './guards/producto-id/producto-exists-guard'
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
 
 @Controller('productos')
+@UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
 export class ProductosController {
   private readonly logger: Logger = new Logger(ProductosController.name)
 
   constructor(private readonly productosService: ProductosService) {}
 
   @Get()
-  async findAll() {
+  @CacheKey('all_products')
+  @CacheTTL(30)
+  async findAll(@Paginate() query: PaginateQuery) {
     this.logger.log('Find all productos')
-    return await this.productosService.findAll()
+    return await this.productosService.findAll(query)
   }
 
   @Get(':id')
@@ -66,7 +71,7 @@ export class ProductosController {
     // borrado fisico
     // return await this.productosService.remove(id)
     // borrado logico
-    return await this.productosService.removeSoft(id)
+    await this.productosService.removeSoft(id)
   }
 
   @Patch('/imagen/:id')
@@ -108,13 +113,13 @@ export class ProductosController {
       },
     }),
   ) // 'file' es el nombre del campo en el formulario
-  updateImage(
+  async updateImage(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
     this.logger.log(`Actualizando imagen al producto con ${id}:  ${file}`)
 
-    return this.productosService.updateImage(id, file, req, true)
+    return await this.productosService.updateImage(id, file, req, true)
   }
 }

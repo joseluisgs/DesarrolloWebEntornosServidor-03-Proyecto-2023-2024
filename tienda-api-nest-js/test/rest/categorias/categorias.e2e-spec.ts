@@ -4,6 +4,7 @@ import { CategoriasService } from '../../../src/rest/categorias/categorias.servi
 import { CategoriaEntity } from '../../../src/rest/categorias/entities/categoria.entity'
 import * as request from 'supertest'
 import { CategoriasController } from '../../../src/rest/categorias/categorias.controller'
+import { CacheModule } from '@nestjs/cache-manager'
 
 // https://blog.logrocket.com/end-end-testing-nestjs-typeorm/
 
@@ -43,6 +44,7 @@ describe('CategoriasController (e2e)', () => {
     // Cargamos solo el controlador y el servicio que vamos a probar, no el módulo que arrastra con todo
     // No es de integración si no e2e, con mocks
     const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()], // importamos el módulo de caché, lo necesita el controlador (interceptores y anotaciones)
       controllers: [CategoriasController],
       providers: [
         CategoriasService,
@@ -64,12 +66,25 @@ describe('CategoriasController (e2e)', () => {
   })
 
   describe('GET /categorias', () => {
-    it('should return an array of categorias', async () => {
+    it('should return a page of categorias', async () => {
       // Configurar el mock para devolver un resultado específico
       mockCategoriasService.findAll.mockResolvedValue([myCategoria])
 
       const { body } = await request(app.getHttpServer())
         .get(myEndpoint)
+        .expect(200)
+      expect(() => {
+        expect(body).toEqual([myCategoria])
+        expect(mockCategoriasService.findAll).toHaveBeenCalled()
+      })
+    })
+
+    it('should return a page of categorias with query', async () => {
+      // Configurar el mock para devolver un resultado específico
+      mockCategoriasService.findAll.mockResolvedValue([myCategoria])
+
+      const { body } = await request(app.getHttpServer())
+        .get(`${myEndpoint}?limit=10&page=1`)
         .expect(200)
       expect(() => {
         expect(body).toEqual([myCategoria])

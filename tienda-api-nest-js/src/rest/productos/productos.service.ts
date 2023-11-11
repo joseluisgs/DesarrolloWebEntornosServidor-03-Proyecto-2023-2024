@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -19,6 +20,15 @@ import {
   Notificacion,
   NotificacionTipo,
 } from '../../websockets/notifications/models/notificacion.model'
+import { Cache } from 'cache-manager'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import {
+  FilterOperator,
+  FilterSuffix,
+  paginate,
+  PaginateQuery,
+} from 'nestjs-paginate'
+import { hash } from 'typeorm/util/StringUtils'
 
 @Injectable()
 export class ProductosService {
@@ -33,27 +43,74 @@ export class ProductosService {
     private readonly productosMapper: ProductosMapper,
     private readonly storageService: StorageService,
     private readonly productsNotificationsGateway: ProductsNotificationsGateway,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
 
-  async findAll(): Promise<ResponseProductoDto[]> {
+  async findAll(query: PaginateQuery) {
     this.logger.log('Find all productos')
-    // No puedo usar .find, porque quiero devolver el nombre de la categoría
-    // Uso leftJoinAndSelect para que me devuelva los productos con la categoría
-    const productos = await this.productoRepository
+    // check cache
+    const cache = await this.cacheManager.get(
+      `all_products_page_${hash(JSON.stringify(query))}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
+
+    // Creo el queryBuilder para poder hacer el leftJoinAndSelect con la categoría
+    const queryBuilder = this.productoRepository
       .createQueryBuilder('producto')
       .leftJoinAndSelect('producto.categoria', 'categoria')
-      .orderBy('producto.id', 'ASC')
-      .getMany()
 
-    return productos.map((producto) =>
-      this.productosMapper.toResponseDto(producto),
+    const pagination = await paginate(query, queryBuilder, {
+      sortableColumns: ['marca', 'modelo', 'descripcion', 'precio', 'stock'],
+      defaultSortBy: [['id', 'ASC']],
+      searchableColumns: ['marca', 'modelo', 'descripcion', 'precio', 'stock'],
+      filterableColumns: {
+        marca: [FilterOperator.EQ, FilterSuffix.NOT],
+        modelo: [FilterOperator.EQ, FilterSuffix.NOT],
+        descripcion: [FilterOperator.EQ, FilterSuffix.NOT],
+        precio: true,
+        stock: true,
+        isDeleted: [FilterOperator.EQ, FilterSuffix.NOT],
+      },
+      //select: ['id', 'marca', 'modelo', 'descripcion', 'precio', 'stock'],
+    })
+
+    // console.log(pagination)
+
+    // mapeamos los elementos de la pagina para devolverlos como queremos con la categoria
+    // pero debe existir la propiodad y no se indefinido, si no es un []
+    const res = {
+      data: (pagination.data ?? []).map((product) =>
+        this.productosMapper.toResponseDto(product),
+      ),
+      meta: pagination.meta,
+      links: pagination.links,
+    }
+
+    // Guardamos en caché
+    await this.cacheManager.set(
+      `all_products_page_${hash(JSON.stringify(query))}`,
+      res,
+      60,
     )
+    return res
   }
 
   async findOne(id: number): Promise<ResponseProductoDto> {
     this.logger.log(`Find one producto by id:${id}`)
+    // Cache
+    const cache: ResponseProductoDto = await this.cacheManager.get(
+      `product_${id}`,
+    )
+    if (cache) {
+      console.log('Cache hit')
+      this.logger.log('Cache hit')
+      return cache
+    }
     // No puedo usar .findOneBy, porque quiero devolver el nombre de la categoría
     const productToFind = await this.productoRepository
       .createQueryBuilder('producto')
@@ -65,7 +122,10 @@ export class ProductosService {
       throw new NotFoundException(`Producto con id ${id} no encontrado`)
     }
 
-    return this.productosMapper.toResponseDto(productToFind)
+    const res = this.productosMapper.toResponseDto(productToFind)
+    // Guardamos en caché
+    await this.cacheManager.set(`product_${id}`, res, 60)
+    return res
   }
 
   async create(
@@ -80,6 +140,7 @@ export class ProductosService {
     const productoCreated = await this.productoRepository.save(productoToCreate)
     const dto = this.productosMapper.toResponseDto(productoCreated)
     this.onChange(NotificacionTipo.CREATE, dto)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
@@ -104,6 +165,9 @@ export class ProductosService {
     })
     const dto = this.productosMapper.toResponseDto(productoUpdated)
     this.onChange(NotificacionTipo.UPDATE, dto)
+    // Invalida la caché del producto específico y 'product_all' cuando se actualiza un producto
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
@@ -119,6 +183,8 @@ export class ProductosService {
     }
     const dto = this.productosMapper.toResponseDto(productoRemoved)
     this.onChange(NotificacionTipo.DELETE, dto)
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
@@ -129,12 +195,22 @@ export class ProductosService {
     const productoRemoved = await this.productoRepository.save(productToRemove)
     const dto = this.productosMapper.toResponseDto(productoRemoved)
     this.onChange(NotificacionTipo.DELETE, dto)
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
   }
 
   public async checkCategoria(
     nombreCategoria: string,
   ): Promise<CategoriaEntity> {
+    // Cache
+    const cache: CategoriaEntity = await this.cacheManager.get(
+      `category_${nombreCategoria}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     // Comprobamos si existe la categoria
     // No uso el fin por la minúscula porque no es case sensitive
     const categoria = await this.categoriaRepository
@@ -149,15 +225,27 @@ export class ProductosService {
       throw new BadRequestException(`Categoría ${nombreCategoria} no existe`)
     }
 
+    // Guardamos en caché
+    await this.cacheManager.set(`category_${nombreCategoria}`, categoria, 60)
     return categoria
   }
 
   public async exists(id: number): Promise<ProductoEntity> {
+    // Cache
+    const cache: ProductoEntity = await this.cacheManager.get(
+      `product_entity_${id}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     const product = await this.productoRepository.findOneBy({ id })
     if (!product) {
       this.logger.log(`Producto con id ${id} no encontrado`)
       throw new NotFoundException(`Producto con id ${id} no encontrado`)
     }
+    // Guardamos en caché
+    await this.cacheManager.set(`product_entity_${id}`, product, 60)
     return product
   }
 
@@ -209,7 +297,16 @@ export class ProductosService {
     const productoUpdated = await this.productoRepository.save(productToUpdate)
     const dto = this.productosMapper.toResponseDto(productoUpdated)
     this.onChange(NotificacionTipo.UPDATE, dto)
+    await this.invalidateCacheKey(`product_${id}`)
+    await this.invalidateCacheKey('all_products')
     return dto
+  }
+
+  async invalidateCacheKey(keyPattern: string): Promise<void> {
+    const cacheKeys = await this.cacheManager.store.keys()
+    const keysToDelete = cacheKeys.filter((key) => key.startsWith(keyPattern))
+    const promises = keysToDelete.map((key) => this.cacheManager.del(key))
+    await Promise.all(promises)
   }
 
   private onChange(tipo: NotificacionTipo, data: ResponseProductoDto) {

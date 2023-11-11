@@ -13,6 +13,7 @@ const ENDPOINT: string = `/ws/${process.env.API_VERSION || 'v1'}/productos`
 export class ProductsNotificationsGateway {
   @WebSocketServer()
   private server: Server
+
   private readonly logger = new Logger(ProductsNotificationsGateway.name)
 
   constructor() {
@@ -22,6 +23,19 @@ export class ProductsNotificationsGateway {
   sendMessage(notification: Notificacion<ResponseProductoDto>) {
     this.server.emit('updates', notification)
   }
+
+  // Si quiero leer lo que llega y reenviarlo
+  /*@SubscribeMessage('updateProduct')
+  handleUpdateProduct(client: Socket, data: any) {
+    // Aquí puedes manejar la lógica para procesar la actualización del producto
+    // y enviar la notificación a todos los clientes conectados
+    const notification = {
+      message: 'Se ha actualizado un producto',
+      data: data,
+    }
+
+    this.server.emit('updates', notification)
+  }*/
 
   private handleConnection(client: Socket) {
     // Este método se ejecutará cuando un cliente se conecte al WebSocket
