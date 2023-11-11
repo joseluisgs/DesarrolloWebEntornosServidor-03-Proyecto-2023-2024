@@ -59,20 +59,6 @@ describe('CategoriasService', () => {
   })
 
   describe('findAll', () => {
-    // Para evitar el problema del linter!!
-    const expectPaginatedResult = (result, paginateOptions) => {
-      // Expect the result to have the correct itemsPerPage
-      expect(result.meta.itemsPerPage).toEqual(paginateOptions.limit)
-      // Expect the result to have the correct currentPage
-      expect(result.meta.currentPage).toEqual(paginateOptions.page)
-      // Expect the result to have the correct totalPages
-      expect(result.meta.totalPages).toEqual(1) // You may need to adjust this value based on your test case
-      // Expect the result to have the correct current link
-      expect(result.links.current).toEqual(
-        `categorias?page=${paginateOptions.page}&limit=${paginateOptions.limit}&sortBy=nombre:ASC`,
-      )
-    }
-
     it('should return all categories', async () => {
       // Mock the cacheManager.get method to return null
 
@@ -115,10 +101,18 @@ describe('CategoriasService', () => {
         .mockReturnValue(mockQueryBuilder as any)
 
       // Call the findAll method
-      const result = await service.findAll(paginateOptions)
+      const result: any = await service.findAll(paginateOptions)
 
       // console.log(result)
-      expectPaginatedResult(result, paginateOptions)
+      expect(result.meta.itemsPerPage).toEqual(paginateOptions.limit)
+      // Expect the result to have the correct currentPage
+      expect(result.meta.currentPage).toEqual(paginateOptions.page)
+      // Expect the result to have the correct totalPages
+      expect(result.meta.totalPages).toEqual(1) // You may need to adjust this value based on your test case
+      // Expect the result to have the correct current link
+      expect(result.links.current).toEqual(
+        `categorias?page=${paginateOptions.page}&limit=${paginateOptions.limit}&sortBy=nombre:ASC`,
+      )
       expect(cacheManager.get).toHaveBeenCalled()
       expect(cacheManager.set).toHaveBeenCalled()
     })
