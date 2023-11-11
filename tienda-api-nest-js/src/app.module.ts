@@ -19,6 +19,5 @@ import { DatabaseModule } from './config/database/database.module'
     StorageModule,
     NotificationsModule,
   ],
-  controllers: [],
 })
 export class AppModule {}
