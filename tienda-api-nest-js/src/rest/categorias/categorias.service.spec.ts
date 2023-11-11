@@ -116,9 +116,8 @@ describe('CategoriasService', () => {
 
       // Call the findAll method
       const result = await service.findAll(paginateOptions)
+
       // console.log(result)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       expectPaginatedResult(result, paginateOptions)
       expect(cacheManager.get).toHaveBeenCalled()
       expect(cacheManager.set).toHaveBeenCalled()
