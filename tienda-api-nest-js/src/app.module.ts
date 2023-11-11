@@ -6,6 +6,7 @@ import { CategoriasModule } from './rest/categorias/categorias.module'
 import { StorageModule } from './rest/storage/storage.module'
 import { NotificationsModule } from './websockets/notifications/notifications.module'
 import * as process from 'process'
+import { CacheModule } from '@nestjs/cache-manager'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import * as process from 'process'
       synchronize: process.env.NODE_ENV === 'dev', // Esto es para que se sincronicen las entidades con la base de datos
       logging: process.env.NODE_ENV === 'dev' ? 'all' : false, // Esto es para que se muestren los logs de las consultas
     }),
+    CacheModule.register(), // Puede haber opciones de configuración (por defecto)
     // Luego se cargan los módulos de la aplicación
     ProductosModule,
     CategoriasModule,

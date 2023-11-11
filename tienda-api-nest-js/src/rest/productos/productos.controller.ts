@@ -24,20 +24,26 @@ import { diskStorage } from 'multer'
 import { extname, parse } from 'path'
 import { Request } from 'express'
 import { ProductoExistsGuard } from './guards/producto-id/producto-exists-guard'
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 
 @Controller('productos')
+@UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
 export class ProductosController {
   private readonly logger: Logger = new Logger(ProductosController.name)
 
   constructor(private readonly productosService: ProductosService) {}
 
   @Get()
+  @CacheKey('all_products')
+  @CacheTTL(30)
   async findAll() {
     this.logger.log('Find all productos')
     return await this.productosService.findAll()
   }
 
   @Get(':id')
+  @CacheKey('product_')
+  @CacheTTL(30)
   async findOne(@Param('id') id: number) {
     this.logger.log(`Find one producto by id:${id}`)
     return await this.productosService.findOne(id)
@@ -47,7 +53,10 @@ export class ProductosController {
   @HttpCode(201)
   async create(@Body() createProductoDto: CreateProductoDto) {
     this.logger.log(`Create producto ${createProductoDto}`)
-    return await this.productosService.create(createProductoDto)
+    const createdProduct = await this.productosService.create(createProductoDto)
+    // Invalidar la caché de todos los productos
+    await this.productosService.invalidateCacheKey('all_products')
+    return createdProduct
   }
 
   @Put(':id')
@@ -56,7 +65,14 @@ export class ProductosController {
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
     this.logger.log(`Update producto with id:${id}-${updateProductoDto}`)
-    return await this.productosService.update(id, updateProductoDto)
+    const updatedProduct = await this.productosService.update(
+      id,
+      updateProductoDto,
+    )
+    // Invalidar la caché del producto específico y de todos los productos
+    await this.productosService.invalidateCacheKey(`product_${id}`)
+    await this.productosService.invalidateCacheKey('all_products')
+    return updatedProduct
   }
 
   @Delete(':id')
@@ -66,7 +82,10 @@ export class ProductosController {
     // borrado fisico
     // return await this.productosService.remove(id)
     // borrado logico
-    return await this.productosService.removeSoft(id)
+    await this.productosService.removeSoft(id)
+    // Invalidar la caché del producto específico y de todos los productos
+    await this.productosService.invalidateCacheKey(`product_${id}`)
+    await this.productosService.invalidateCacheKey('all_products')
   }
 
   @Patch('/imagen/:id')
@@ -108,13 +127,22 @@ export class ProductosController {
       },
     }),
   ) // 'file' es el nombre del campo en el formulario
-  updateImage(
+  async updateImage(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
     this.logger.log(`Actualizando imagen al producto con ${id}:  ${file}`)
 
-    return this.productosService.updateImage(id, file, req, true)
+    const updatedProduct = await this.productosService.updateImage(
+      id,
+      file,
+      req,
+      true,
+    )
+    // Invalidar la caché del producto específico y de todos los productos
+    await this.productosService.invalidateCacheKey(`product_${id}`)
+    await this.productosService.invalidateCacheKey('all_products')
+    return updatedProduct
   }
 }

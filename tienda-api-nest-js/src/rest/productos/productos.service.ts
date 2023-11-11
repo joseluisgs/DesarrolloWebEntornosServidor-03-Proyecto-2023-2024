@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -19,6 +20,8 @@ import {
   Notificacion,
   NotificacionTipo,
 } from '../../websockets/notifications/models/notificacion.model'
+import { Cache } from 'cache-manager'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
 
 @Injectable()
 export class ProductosService {
@@ -33,6 +36,7 @@ export class ProductosService {
     private readonly productosMapper: ProductosMapper,
     private readonly storageService: StorageService,
     private readonly productsNotificationsGateway: ProductsNotificationsGateway,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
@@ -210,6 +214,10 @@ export class ProductosService {
     const dto = this.productosMapper.toResponseDto(productoUpdated)
     this.onChange(NotificacionTipo.UPDATE, dto)
     return dto
+  }
+
+  async invalidateCacheKey(key: string): Promise<void> {
+    await this.cacheManager.del(key)
   }
 
   private onChange(tipo: NotificacionTipo, data: ResponseProductoDto) {
