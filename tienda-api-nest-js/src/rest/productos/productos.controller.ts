@@ -42,8 +42,6 @@ export class ProductosController {
   }
 
   @Get(':id')
-  @CacheKey('product_')
-  @CacheTTL(30)
   async findOne(@Param('id') id: number) {
     this.logger.log(`Find one producto by id:${id}`)
     return await this.productosService.findOne(id)
@@ -53,10 +51,7 @@ export class ProductosController {
   @HttpCode(201)
   async create(@Body() createProductoDto: CreateProductoDto) {
     this.logger.log(`Create producto ${createProductoDto}`)
-    const createdProduct = await this.productosService.create(createProductoDto)
-    // Invalidar la caché de todos los productos
-    await this.productosService.invalidateCacheKey('all_products')
-    return createdProduct
+    return await this.productosService.create(createProductoDto)
   }
 
   @Put(':id')
@@ -65,14 +60,7 @@ export class ProductosController {
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
     this.logger.log(`Update producto with id:${id}-${updateProductoDto}`)
-    const updatedProduct = await this.productosService.update(
-      id,
-      updateProductoDto,
-    )
-    // Invalidar la caché del producto específico y de todos los productos
-    await this.productosService.invalidateCacheKey(`product_${id}`)
-    await this.productosService.invalidateCacheKey('all_products')
-    return updatedProduct
+    return await this.productosService.update(id, updateProductoDto)
   }
 
   @Delete(':id')
@@ -83,9 +71,6 @@ export class ProductosController {
     // return await this.productosService.remove(id)
     // borrado logico
     await this.productosService.removeSoft(id)
-    // Invalidar la caché del producto específico y de todos los productos
-    await this.productosService.invalidateCacheKey(`product_${id}`)
-    await this.productosService.invalidateCacheKey('all_products')
   }
 
   @Patch('/imagen/:id')
@@ -134,15 +119,6 @@ export class ProductosController {
   ) {
     this.logger.log(`Actualizando imagen al producto con ${id}:  ${file}`)
 
-    const updatedProduct = await this.productosService.updateImage(
-      id,
-      file,
-      req,
-      true,
-    )
-    // Invalidar la caché del producto específico y de todos los productos
-    await this.productosService.invalidateCacheKey(`product_${id}`)
-    await this.productosService.invalidateCacheKey('all_products')
-    return updatedProduct
+    return await this.productosService.updateImage(id, file, req, true)
   }
 }

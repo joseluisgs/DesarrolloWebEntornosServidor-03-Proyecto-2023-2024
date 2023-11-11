@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Get,
   Inject,
   Injectable,
   Logger,
@@ -22,7 +21,7 @@ import {
   NotificacionTipo,
 } from '../../websockets/notifications/models/notificacion.model'
 import { Cache } from 'cache-manager'
-import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
 
 @Injectable()
 export class ProductosService {
@@ -42,11 +41,15 @@ export class ProductosService {
 
   //Implementar el método findAll y findOne con inner join para que devuelva el nombre de la categoría
 
-  @Get()
-  @CacheKey('all_products')
-  @CacheTTL(30)
   async findAll(): Promise<ResponseProductoDto[]> {
     this.logger.log('Find all productos')
+    // cache
+    const cache: ResponseProductoDto[] =
+      await this.cacheManager.get('all_products')
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     // No puedo usar .find, porque quiero devolver el nombre de la categoría
     // Uso leftJoinAndSelect para que me devuelva los productos con la categoría
     const productos = await this.productoRepository
@@ -55,15 +58,25 @@ export class ProductosService {
       .orderBy('producto.id', 'ASC')
       .getMany()
 
-    return productos.map((producto) =>
+    const res = productos.map((producto) =>
       this.productosMapper.toResponseDto(producto),
     )
+    // Guardamos en caché
+    await this.cacheManager.set('all_products', res, 60)
+    return res
   }
 
-  @CacheKey('product_')
-  @CacheTTL(30)
   async findOne(id: number): Promise<ResponseProductoDto> {
     this.logger.log(`Find one producto by id:${id}`)
+    // Cache
+    const cache: ResponseProductoDto = await this.cacheManager.get(
+      `product_${id}`,
+    )
+    if (cache) {
+      console.log('Cache hit')
+      this.logger.log('Cache hit')
+      return cache
+    }
     // No puedo usar .findOneBy, porque quiero devolver el nombre de la categoría
     const productToFind = await this.productoRepository
       .createQueryBuilder('producto')
@@ -75,7 +88,10 @@ export class ProductosService {
       throw new NotFoundException(`Producto con id ${id} no encontrado`)
     }
 
-    return this.productosMapper.toResponseDto(productToFind)
+    const res = this.productosMapper.toResponseDto(productToFind)
+    // Guardamos en caché
+    await this.cacheManager.set(`product_${id}`, res, 60)
+    return res
   }
 
   async create(
@@ -150,11 +166,17 @@ export class ProductosService {
     return dto
   }
 
-  @CacheKey('categoria_')
-  @CacheTTL(30)
   public async checkCategoria(
     nombreCategoria: string,
   ): Promise<CategoriaEntity> {
+    // Cache
+    const cache: CategoriaEntity = await this.cacheManager.get(
+      `category_${nombreCategoria}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     // Comprobamos si existe la categoria
     // No uso el fin por la minúscula porque no es case sensitive
     const categoria = await this.categoriaRepository
@@ -169,17 +191,27 @@ export class ProductosService {
       throw new BadRequestException(`Categoría ${nombreCategoria} no existe`)
     }
 
+    // Guardamos en caché
+    await this.cacheManager.set(`category_${nombreCategoria}`, categoria, 60)
     return categoria
   }
 
-  @CacheKey('product_')
-  @CacheTTL(30)
   public async exists(id: number): Promise<ProductoEntity> {
+    // Cache
+    const cache: ProductoEntity = await this.cacheManager.get(
+      `product_entity_${id}`,
+    )
+    if (cache) {
+      this.logger.log('Cache hit')
+      return cache
+    }
     const product = await this.productoRepository.findOneBy({ id })
     if (!product) {
       this.logger.log(`Producto con id ${id} no encontrado`)
       throw new NotFoundException(`Producto con id ${id} no encontrado`)
     }
+    // Guardamos en caché
+    await this.cacheManager.set(`product_entity_${id}`, product, 60)
     return product
   }
 

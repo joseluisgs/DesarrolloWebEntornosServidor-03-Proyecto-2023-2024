@@ -9,18 +9,23 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common'
 import { CategoriasService } from './categorias.service'
 import { CreateCategoriaDto } from './dto/create-categoria.dto'
 import { UpdateCategoriaDto } from './dto/update-categoria.dto'
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 
 @Controller('categorias')
+@UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
 export class CategoriasController {
   private readonly logger = new Logger(CategoriasController.name)
 
   constructor(private readonly categoriasService: CategoriasService) {}
 
   @Get()
+  @CacheKey('all_categories')
+  @CacheTTL(30)
   async findAll() {
     this.logger.log('Find all categorias')
     return await this.categoriasService.findAll()
