@@ -223,7 +223,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:3000/v1/categorias?page=1&limit=1&sortBy=nombre:ASC&filter.isDeleted=$eq:false&search=I",
+							"raw": "http://localhost:3000/v1/productos?limit=1&page=1&sortBy=marca:ASC&filter.isDeleted=$eq:false&search=das",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -231,20 +231,20 @@
 							"port": "3000",
 							"path": [
 								"v1",
-								"categorias"
+								"productos"
 							],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
 								{
 									"key": "limit",
 									"value": "1"
 								},
 								{
+									"key": "page",
+									"value": "1"
+								},
+								{
 									"key": "sortBy",
-									"value": "nombre:ASC"
+									"value": "marca:ASC"
 								},
 								{
 									"key": "filter.isDeleted",
@@ -252,7 +252,7 @@
 								},
 								{
 									"key": "search",
-									"value": "I"
+									"value": "das"
 								}
 							]
 						}
