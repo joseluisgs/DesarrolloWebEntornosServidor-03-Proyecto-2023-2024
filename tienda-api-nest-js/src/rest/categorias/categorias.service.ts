@@ -14,6 +14,12 @@ import { CategoriasMapper } from './mappers/categorias.mapper/categorias.mapper'
 import { v4 as uuidv4 } from 'uuid'
 import { Cache } from 'cache-manager'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import {
+  FilterOperator,
+  FilterSuffix,
+  paginate,
+  PaginateQuery,
+} from 'nestjs-paginate'
 
 @Injectable()
 export class CategoriasService {
@@ -26,17 +32,26 @@ export class CategoriasService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async findAll(): Promise<CategoriaEntity[]> {
+  async findAll(query: PaginateQuery) {
     this.logger.log('Find all categorias')
     // cache
-    const cache: CategoriaEntity[] =
-      await this.cacheManager.get('all_categories')
+    const cache = await this.cacheManager.get(
+      `all_categories_page_${query.page}`,
+    )
     if (cache) {
       this.logger.log('Cache hit')
       return cache
     }
-    const res = await this.categoriaRepository.find()
-    // Guardamos en cache
+    const res = await paginate(query, this.categoriaRepository, {
+      sortableColumns: ['nombre'],
+      defaultSortBy: [['nombre', 'ASC']],
+      searchableColumns: ['nombre'],
+      filterableColumns: {
+        nombre: [FilterOperator.EQ, FilterSuffix.NOT],
+        isDeleted: [FilterOperator.EQ, FilterSuffix.NOT],
+      },
+      select: ['id', 'nombre', 'isDeleted', 'createdAt', 'updatedAt'],
+    })
     await this.cacheManager.set('all_categories', res, 60)
     return res
   }
@@ -165,7 +180,10 @@ export class CategoriasService {
     )
   }
 
-  async invalidateCacheKey(key: string): Promise<void> {
-    await this.cacheManager.del(key)
+  async invalidateCacheKey(keyPattern: string): Promise<void> {
+    const cacheKeys = await this.cacheManager.store.keys()
+    const keysToDelete = cacheKeys.filter((key) => key.startsWith(keyPattern))
+    const promises = keysToDelete.map((key) => this.cacheManager.del(key))
+    await Promise.all(promises)
   }
 }
