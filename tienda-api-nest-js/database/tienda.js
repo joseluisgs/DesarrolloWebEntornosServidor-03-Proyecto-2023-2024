@@ -9,13 +9,13 @@ db.createUser({
       db: 'tienda',
     },
   ],
-});
+})
 
 // Nos conectamos a la base de datos world
-db = db.getSiblingDB('tienda');
+db = db.getSiblingDB('tienda')
 
 // Creamos la coleccion city
-db.createCollection('pedidos');
+db.createCollection('pedidos')
 
 // Insertamos los datos de la coleccion pedidos
 db.pedidos.insertMany([
@@ -54,6 +54,5 @@ db.pedidos.insertMany([
     isDeleted: false,
     totalItems: 3,
     total: 51.97,
-    _class: 'Pedido',
   },
-]);
+])
