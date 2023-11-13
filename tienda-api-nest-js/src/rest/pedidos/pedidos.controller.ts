@@ -32,7 +32,14 @@ export class PedidosController {
     @Query('order', new DefaultValuePipe('asc'), OrderValidatePipe)
     order: string,
   ) {
-    this.logger.log('Buscando todos los pedidos')
+    this.logger.log(
+      `Buscando todos los pedidos con: ${JSON.stringify({
+        page,
+        limit,
+        orderBy,
+        order,
+      })}`,
+    )
     return await this.pedidosService.findAll(page, limit, orderBy, order)
   }
 
