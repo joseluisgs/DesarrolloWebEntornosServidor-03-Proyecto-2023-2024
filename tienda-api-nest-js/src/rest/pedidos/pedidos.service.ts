@@ -5,6 +5,9 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Pedido, PedidoDocument } from './schemas/pedido.schema'
 import { PaginateModel } from 'mongoose' // has necesitado importar el esquema en el createFactory del esquema
 
+export const PedidosOrderByValues: string[] = ['_id', 'idUsuario'] // Lo usamos en los pipes
+export const PedidosOrderValues: string[] = ['asc', 'desc'] // Lo usamos en los pipes
+
 @Injectable()
 export class PedidosService {
   private logger = new Logger(PedidosService.name)
@@ -15,9 +18,26 @@ export class PedidosService {
     private pedidosRepository: PaginateModel<PedidoDocument>,
   ) {}
 
-  async findAll() {
-    this.logger.log('Buscando todos los pedidos')
-    return await this.pedidosRepository.find().exec()
+  async findAll(page: number, limit: number, orderBy: string, order: string) {
+    this.logger.log(
+      `Buscando todos los pedidos con paginación y filtros: ${JSON.stringify({
+        page,
+        limit,
+        orderBy,
+        order,
+      })}`,
+    )
+    // Aquí iría la query de ordenación y paginación
+    const options = {
+      page,
+      limit,
+      sort: {
+        [orderBy]: order,
+      },
+      collection: 'es_ES', // para que use la configuración de idioma de España
+    }
+
+    return await this.pedidosRepository.paginate({}, options)
   }
 
   async findOne(id: string) {
