@@ -4,6 +4,8 @@ import { PedidosController } from './pedidos.controller'
 import { MongooseModule, SchemaFactory } from '@nestjs/mongoose'
 import { Pedido } from './schemas/pedido.schema'
 import * as mongoosePaginate from 'mongoose-paginate-v2'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { ProductoEntity } from '../productos/entities/producto.entity'
 
 @Module({
   // El primer paso es en el módulo del recurso a paginar, debemos importar el plugin de paginación
@@ -19,6 +21,7 @@ import * as mongoosePaginate from 'mongoose-paginate-v2'
         },
       },
     ]),
+    TypeOrmModule.forFeature([ProductoEntity]), // Importamos el repositorio de productos
   ],
   controllers: [PedidosController],
   providers: [PedidosService],

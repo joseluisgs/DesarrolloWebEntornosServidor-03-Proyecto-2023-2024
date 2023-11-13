@@ -3,7 +3,10 @@ import { CreatePedidoDto } from './dto/create-pedido.dto'
 import { UpdatePedidoDto } from './dto/update-pedido.dto'
 import { InjectModel } from '@nestjs/mongoose'
 import { Pedido, PedidoDocument } from './schemas/pedido.schema'
-import { PaginateModel } from 'mongoose' // has necesitado importar el esquema en el createFactory del esquema
+import { PaginateModel } from 'mongoose'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ProductoEntity } from '../productos/entities/producto.entity'
+import { Repository } from 'typeorm' // has necesitado importar el esquema en el createFactory del esquema
 
 export const PedidosOrderByValues: string[] = ['_id', 'idUsuario'] // Lo usamos en los pipes
 export const PedidosOrderValues: string[] = ['asc', 'desc'] // Lo usamos en los pipes
@@ -16,6 +19,8 @@ export class PedidosService {
   constructor(
     @InjectModel(Pedido.name)
     private pedidosRepository: PaginateModel<PedidoDocument>,
+    @InjectRepository(ProductoEntity)
+    private readonly productoRepository: Repository<ProductoEntity>,
   ) {}
 
   async findAll(page: number, limit: number, orderBy: string, order: string) {
