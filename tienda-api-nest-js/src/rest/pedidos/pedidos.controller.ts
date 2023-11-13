@@ -15,6 +15,7 @@ import { CreatePedidoDto } from './dto/create-pedido.dto'
 import { OrderByValidatePipe } from './pipes/orderby-validate.pipe'
 import { PedidosService } from './pedidos.service'
 import { OrderValidatePipe } from './pipes/order-validate.pipe'
+import { IdValidatePipe } from './pipes/id-validate.pipe'
 
 @Controller('pedidos')
 export class PedidosController {
@@ -36,7 +37,7 @@ export class PedidosController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', IdValidatePipe) id: string) {
     this.logger.log(`Buscando pedido con id ${id}`)
     return await this.pedidosService.findOne(id)
   }
@@ -47,12 +48,15 @@ export class PedidosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePedidoDto: UpdatePedidoDto) {
+  update(
+    @Param('id', IdValidatePipe) id: string,
+    @Body() updatePedidoDto: UpdatePedidoDto,
+  ) {
     return this.pedidosService.update(+id, updatePedidoDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', IdValidatePipe) id: string) {
     return this.pedidosService.remove(+id)
   }
 }
