@@ -1,30 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as mongoosePaginate from 'mongoose-paginate-v2'
 
-// Nuestro documento de la base de datos para poder usarlo en el servicio
-// y en el controlador, lo usaremos para mapear los datos de la base de datos
-export type PedidoDocument = Pedido & Document
-
-// El esquema de la base de datos
-@Schema({
-  collection: 'pedidos', // Nombre de la colección en la base de datos
-  timestamps: false, // No queremos que se añadan los campos createdAt y updatedAt, los añadimos nosotros
-  // Este método toJSON se ejecutará cada vez que se llame a JSON.stringify() en un documento de Mongoose
-  // mapea el _id a id y elimina __v y _id cuando se llama a JSON.stringify()
-  versionKey: false,
-  id: true,
-  toJSON: {
-    virtuals: true,
-    // Aquí añadimos el método toJSON
-    transform: (doc, ret) => {
-      delete ret.__v
-      ret.id = ret._id
-      delete ret._id
-      delete ret._class
-    },
-  },
-})
-
 // Usamos clases embebidas, por lo que definimos antes las necesarias
 // Recursos adicionales
 export class Direccion {
@@ -134,6 +110,29 @@ export class LineaPedido {
   total: number
 }
 
+// Nuestro documento de la base de datos para poder usarlo en el servicio
+// y en el controlador, lo usaremos para mapear los datos de la base de datos
+export type PedidoDocument = Pedido & Document
+
+// El esquema de la base de datos
+@Schema({
+  collection: 'pedidos', // Nombre de la colección en la base de datos
+  timestamps: false, // No queremos que se añadan los campos createdAt y updatedAt, los añadimos nosotros
+  // Este método toJSON se ejecutará cada vez que se llame a JSON.stringify() en un documento de Mongoose
+  // mapea el _id a id y elimina __v y _id cuando se llama a JSON.stringify()
+  versionKey: false,
+  id: true,
+  toJSON: {
+    virtuals: true,
+    // Aquí añadimos el método toJSON
+    transform: (doc, ret) => {
+      delete ret.__v // Eliminamos el campo __v
+      ret.id = ret._id // Mapeamos el _id a id
+      delete ret._id // Eliminamos el _id
+      delete ret._class // Esto es por si usamos discriminadores
+    },
+  },
+})
 // Nuestra clase principal (esquema)!!
 // Definimos con @Prop() cada uno de los campos de la colección
 export class Pedido {
