@@ -6,8 +6,9 @@ import {
   Get,
   Logger,
   Param,
-  Patch,
+  ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common'
 import { UpdatePedidoDto } from './dto/update-pedido.dto'
@@ -49,21 +50,34 @@ export class PedidosController {
     return await this.pedidosService.findOne(id)
   }
 
+  @Get('usuario/:idUsuario')
+  async findPedidosPorUsuario(
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+  ) {
+    this.logger.log(`Buscando pedidos por usuario ${idUsuario}`)
+    return await this.pedidosService.findPedidosPorUsuario(idUsuario)
+  }
+
   @Post()
   create(@Body() createPedidoDto: CreatePedidoDto) {
+    this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
     return this.pedidosService.create(createPedidoDto)
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id', IdValidatePipe) id: string,
     @Body() updatePedidoDto: UpdatePedidoDto,
   ) {
-    return this.pedidosService.update(+id, updatePedidoDto)
+    this.logger.log(
+      `Actualizando pedido con id ${id} y ${JSON.stringify(updatePedidoDto)}`,
+    )
+    return this.pedidosService.update(id, updatePedidoDto)
   }
 
   @Delete(':id')
   remove(@Param('id', IdValidatePipe) id: string) {
-    return this.pedidosService.remove(+id)
+    this.logger.log(`Eliminando pedido con id ${id}`)
+    return this.pedidosService.remove(id)
   }
 }

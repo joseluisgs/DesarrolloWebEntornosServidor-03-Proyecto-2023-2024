@@ -50,14 +50,24 @@ export class PedidosService {
   }
 
   async create(createPedidoDto: CreatePedidoDto) {
+    this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
     return 'This action adds a new pedido'
   }
 
-  async update(id: number, updatePedidoDto: UpdatePedidoDto) {
+  async update(id: string, updatePedidoDto: UpdatePedidoDto) {
+    this.logger.log(
+      `Actualizando pedido con id ${id} y ${JSON.stringify(updatePedidoDto)}`,
+    )
     return `This action updates a #${id} pedido`
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
+    this.logger.log(`Eliminando pedido con id ${id}`)
     return `This action removes a #${id} pedido`
+  }
+
+  async findPedidosPorUsuario(idUsuario: number) {
+    this.logger.log(`Buscando pedidos por usuario ${idUsuario}`)
+    return await this.pedidosRepository.find({ idUsuario }).exec()
   }
 }
