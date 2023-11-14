@@ -275,7 +275,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:3000/v1/productos/2",
+							"raw": "http://localhost:3000/v1/productos/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -284,7 +284,7 @@
 							"path": [
 								"v1",
 								"productos",
-								"2"
+								"3"
 							]
 						}
 					},
@@ -488,7 +488,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/v1/pedidos/6536518de9b0d305f193b5ef",
+							"raw": "http://localhost:3000/v1/pedidos/655328550938394771bd0d05",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -497,7 +497,7 @@
 							"path": [
 								"v1",
 								"pedidos",
-								"6536518de9b0d305f193b5ef"
+								"655328550938394771bd0d05"
 							]
 						}
 					},
@@ -532,7 +532,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"idUsuario\": 1,\r\n    \"cliente\": {\r\n        \"nombreCompleto\": \"Juan Perez\",\r\n        \"email\": \"juanperez@gmail.com\",\r\n        \"telefono\": \"+34123456789\",\r\n        \"direccion\": {\r\n            \"calle\": \"Calle Mayor\",\r\n            \"numero\": \"10\",\r\n            \"ciudad\": \"Madrid\",\r\n            \"provincia\": \"Madrid\",\r\n            \"pais\": \"España\",\r\n            \"codigoPostal\": \"28001\"\r\n        }\r\n    },\r\n    \"lineasPedido\": [\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\r\n            \"idProducto\": 2,\r\n            \"precioProducto\": 19.99,\r\n            \"cantidad\": 1\r\n        },\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174002\",\r\n            \"idProducto\": 3,\r\n            \"precioProducto\": 15.99,\r\n            \"cantidad\": 2\r\n        }\r\n    ]\r\n}\r\n",
+							"raw": "{\r\n    \"idUsuario\": 1,\r\n    \"cliente\": {\r\n        \"nombreCompleto\": \"Save Pedido\",\r\n        \"email\": \"SavePedido@gmail.com\",\r\n        \"telefono\": \"+34123456789\",\r\n        \"direccion\": {\r\n            \"calle\": \"Calle Mayor\",\r\n            \"numero\": \"10\",\r\n            \"ciudad\": \"Madrid\",\r\n            \"provincia\": \"Madrid\",\r\n            \"pais\": \"España\",\r\n            \"codigoPostal\": \"28001\"\r\n        }\r\n    },\r\n    \"lineasPedido\": [\r\n        {\r\n            \"idProducto\": 2,\r\n            \"precioProducto\": 19.99,\r\n            \"cantidad\": 1\r\n        },\r\n        {\r\n            \"idProducto\": 3,\r\n            \"precioProducto\": 15.99,\r\n            \"cantidad\": 2\r\n        }\r\n    ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -561,7 +561,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"idUsuario\": 1,\r\n    \"cliente\": {\r\n        \"nombreCompleto\": \"Juan Perez\",\r\n        \"email\": \"juanperez@gmail.com\",\r\n        \"telefono\": \"+34123456789\",\r\n        \"direccion\": {\r\n            \"calle\": \"Calle Mayor\",\r\n            \"numero\": \"10\",\r\n            \"ciudad\": \"Madrid\",\r\n            \"provincia\": \"Madrid\",\r\n            \"pais\": \"España\",\r\n            \"codigoPostal\": \"28001\"\r\n        }\r\n    },\r\n    \"lineasPedido\": [\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\r\n            \"idProducto\": 2,\r\n            \"precioProducto\": 19.99,\r\n            \"cantidad\": 1\r\n        },\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174002\",\r\n            \"idProducto\": 3,\r\n            \"precioProducto\": 15.99,\r\n            \"cantidad\": 2\r\n        }\r\n    ]\r\n}\r\n",
+							"raw": "{\r\n    \"idUsuario\": 1,\r\n    \"cliente\": {\r\n        \"nombreCompleto\": \"Update Pedido\",\r\n        \"email\": \"juanperez@gmail.com\",\r\n        \"telefono\": \"+34123456789\",\r\n        \"direccion\": {\r\n            \"calle\": \"Calle Mayor\",\r\n            \"numero\": \"10\",\r\n            \"ciudad\": \"Madrid\",\r\n            \"provincia\": \"Madrid\",\r\n            \"pais\": \"España\",\r\n            \"codigoPostal\": \"28001\"\r\n        }\r\n    },\r\n    \"lineasPedido\": [\r\n        {\r\n            \"idProducto\": 2,\r\n            \"precioProducto\": 19.99,\r\n            \"cantidad\": 1\r\n        },\r\n        {\r\n            \"idProducto\": 3,\r\n            \"precioProducto\": 15.99,\r\n            \"cantidad\": 1\r\n        }\r\n    ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -569,7 +569,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/v1/pedidos/65365cdd1c2d540a8765eb83",
+							"raw": "http://localhost:3000/v1/pedidos/655328550938394771bd0d05",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -578,7 +578,7 @@
 							"path": [
 								"v1",
 								"pedidos",
-								"65365cdd1c2d540a8765eb83"
+								"655328550938394771bd0d05"
 							]
 						}
 					},
@@ -599,7 +599,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/v1/pedidos/65365c274b52b604852506a8",
+							"raw": "http://localhost:3000/v1/pedidos/65532a084bc409c0da22f585",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -608,7 +608,7 @@
 							"path": [
 								"v1",
 								"pedidos",
-								"65365c274b52b604852506a8"
+								"65532a084bc409c0da22f585"
 							]
 						}
 					},

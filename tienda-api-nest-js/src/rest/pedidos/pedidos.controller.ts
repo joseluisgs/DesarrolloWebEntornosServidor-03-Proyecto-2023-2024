@@ -4,6 +4,7 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
+  HttpCode,
   Logger,
   Param,
   ParseIntPipe,
@@ -55,29 +56,31 @@ export class PedidosController {
     @Param('idUsuario', ParseIntPipe) idUsuario: number,
   ) {
     this.logger.log(`Buscando pedidos por usuario ${idUsuario}`)
-    return await this.pedidosService.findPedidosPorUsuario(idUsuario)
+    return await this.pedidosService.findByIdUsuario(idUsuario)
   }
 
   @Post()
-  create(@Body() createPedidoDto: CreatePedidoDto) {
+  @HttpCode(201)
+  async create(@Body() createPedidoDto: CreatePedidoDto) {
     this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
-    return this.pedidosService.create(createPedidoDto)
+    return await this.pedidosService.create(createPedidoDto)
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', IdValidatePipe) id: string,
     @Body() updatePedidoDto: UpdatePedidoDto,
   ) {
     this.logger.log(
       `Actualizando pedido con id ${id} y ${JSON.stringify(updatePedidoDto)}`,
     )
-    return this.pedidosService.update(id, updatePedidoDto)
+    return await this.pedidosService.update(id, updatePedidoDto)
   }
 
   @Delete(':id')
-  remove(@Param('id', IdValidatePipe) id: string) {
+  @HttpCode(204)
+  async remove(@Param('id', IdValidatePipe) id: string) {
     this.logger.log(`Eliminando pedido con id ${id}`)
-    return this.pedidosService.remove(id)
+    await this.pedidosService.remove(id)
   }
 }
