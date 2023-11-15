@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   Injectable,
 } from '@nestjs/common'
-import { ProductosService } from '../../productos.service'
+import { ProductosService } from '../productos.service'
 import { Observable } from 'rxjs'
 
 @Injectable()
