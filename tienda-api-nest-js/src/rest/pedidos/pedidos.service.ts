@@ -12,7 +12,8 @@ import { PaginateModel } from 'mongoose'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ProductoEntity } from '../productos/entities/producto.entity'
 import { Repository } from 'typeorm'
-import { PedidosMapper } from './mappers/pedidos.mapper' // has necesitado importar el esquema en el createFactory del esquema
+import { PedidosMapper } from './mappers/pedidos.mapper'
+import { Usuario } from '../users/entities/user.entity' // has necesitado importar el esquema en el createFactory del esquema
 
 export const PedidosOrderByValues: string[] = ['_id', 'idUsuario'] // Lo usamos en los pipes
 export const PedidosOrderValues: string[] = ['asc', 'desc'] // Lo usamos en los pipes
@@ -27,6 +28,8 @@ export class PedidosService {
     private pedidosRepository: PaginateModel<PedidoDocument>,
     @InjectRepository(ProductoEntity)
     private readonly productosRepository: Repository<ProductoEntity>,
+    @InjectRepository(Usuario)
+    private readonly usuariosRepository: Repository<Usuario>,
     private readonly pedidosMapper: PedidosMapper,
   ) {}
 
@@ -115,6 +118,12 @@ export class PedidosService {
     }
     await this.returnStockPedidos(pedidoToDelete)
     await this.pedidosRepository.findByIdAndDelete(id).exec()
+  }
+
+  async userExists(idUsuario: number): Promise<boolean> {
+    this.logger.log(`Comprobando si existe el usuario ${idUsuario}`)
+    const usuario = await this.usuariosRepository.findOneBy({ id: idUsuario })
+    return !!usuario
   }
 
   private async checkPedido(pedido: Pedido): Promise<void> {

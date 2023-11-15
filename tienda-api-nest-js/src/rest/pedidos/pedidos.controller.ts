@@ -11,6 +11,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import { UpdatePedidoDto } from './dto/update-pedido.dto'
@@ -20,6 +21,7 @@ import { PedidosService } from './pedidos.service'
 import { OrderValidatePipe } from './pipes/order-validate.pipe'
 import { IdValidatePipe } from './pipes/id-validate.pipe'
 import { CacheInterceptor } from '@nestjs/cache-manager'
+import { UsuarioExistsGuard } from './guards/usuario-exists.guard'
 
 @Controller('pedidos')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cache
@@ -64,12 +66,14 @@ export class PedidosController {
 
   @Post()
   @HttpCode(201)
+  @UseGuards(UsuarioExistsGuard) // Aplicar el guard aquí
   async create(@Body() createPedidoDto: CreatePedidoDto) {
     this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
     return await this.pedidosService.create(createPedidoDto)
   }
 
   @Put(':id')
+  @UseGuards(UsuarioExistsGuard) // Aplicar el guard aquí
   async update(
     @Param('id', IdValidatePipe) id: string,
     @Body() updatePedidoDto: UpdatePedidoDto,
