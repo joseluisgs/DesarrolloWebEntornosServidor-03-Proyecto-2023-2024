@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Usuario } from './entities/user.entity'
@@ -6,6 +11,10 @@ import { UsuariosMapper } from './mappers/usuarios.mapper'
 import { CreateUserDto } from './dto/create-user.dto'
 import { Role, UserRole } from './entities/user-role.entity'
 import { BcryptService } from './bcrypt.service'
+import { InjectModel } from '@nestjs/mongoose'
+import { Pedido, PedidoDocument } from '../pedidos/schemas/pedido.schema'
+import { PaginateModel } from 'mongoose'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
 export class UsersService {
@@ -18,6 +27,8 @@ export class UsersService {
     private readonly userRoleRepository: Repository<UserRole>,
     private readonly usuariosMapper: UsuariosMapper,
     private readonly bcryptService: BcryptService,
+    @InjectModel(Pedido.name)
+    private pedidosRepository: PaginateModel<PedidoDocument>,
   ) {}
 
   async findAll() {
@@ -76,6 +87,67 @@ export class UsersService {
   async validatePassword(password: string, hashPassword: string) {
     this.logger.log(`validatePassword`)
     return await this.bcryptService.isMatch(password, hashPassword)
+  }
+
+  async deleteUserProfileById(idUser: number) {
+    this.logger.log(`deleteUserById: ${idUser}`)
+    const user = await this.usuariosRepository.findOneBy({ id: idUser })
+    if (!user) {
+      throw new NotFoundException(`User not found with id ${idUser}`)
+    }
+    const existsPedidos = await this.pedidosRepository.exists({
+      idUsuario: user.id,
+    })
+    // Si existen pedidos, hacemos borrado logico
+    if (existsPedidos) {
+      user.updatedAt = new Date()
+      user.isDeleted = true
+      return await this.usuariosRepository.save(user)
+    } else {
+      // Si no existen pedidos, hacemos borrado fisico
+      // borramos de la tabla de roles
+      for (const userRole of user.roles) {
+        await this.userRoleRepository.remove(userRole)
+      }
+      return await this.usuariosRepository.delete({ id: user.id })
+    }
+  }
+
+  async updateUserProfileById(id: number, updateUserDto: UpdateUserDto) {
+    this.logger.log(
+      `updateUserProfileById: ${id} with ${JSON.stringify(updateUserDto)}`,
+    )
+    const user = await this.usuariosRepository.findOneBy({ id })
+    if (!user) {
+      throw new NotFoundException(`User not found with id ${id}`)
+    }
+    // Si el usuario quiere cambiar el username, validamos que no exista en la base de datos y si existe no sea yo mismo
+    if (updateUserDto.username) {
+      const existingUser = await this.findByUsername(updateUserDto.username)
+      if (existingUser && existingUser.id !== id) {
+        throw new BadRequestException('username already exists')
+      }
+    }
+    // Si el usuario quiere cambiar el email, validamos que no exista en la base de datos y si existe no sea yo mismo
+    if (updateUserDto.email) {
+      const existingUser = await this.findByEmail(updateUserDto.email)
+      if (existingUser && existingUser.id !== id) {
+        throw new BadRequestException('email already exists')
+      }
+    }
+    // Si el usuario quiere cambiar el password, lo hasheamos
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.bcryptService.hash(
+        updateUserDto.password,
+      )
+    }
+    // No puedo cambiar los roles
+    delete updateUserDto.roles
+    Object.assign(user, updateUserDto)
+    // Actualizamos los datos del usuario
+    const updatedUser = await this.usuariosRepository.save(user)
+    // Devolver los datos mappeados
+    return this.usuariosMapper.toResponseDto(updatedUser)
   }
 
   private async findByEmail(email: string) {

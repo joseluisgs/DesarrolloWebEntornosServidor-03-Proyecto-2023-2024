@@ -19,8 +19,6 @@ export class RolesAuthGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = context.switchToHttp()
     const { user } = ctx.getRequest() // Obtenemos el usuario, es lo mismo que ctx.getRequest().user
-    console.log('para entrar roles', this.roles)
-    console.log('roles de user', user.roles)
 
     // Si el usuario no tiene roles, no tiene acceso
     const hasRequiredRole = user.roles.some((role) => this.roles.includes(role))
