@@ -20,6 +20,10 @@ import {RolesExistsGuard} from './guards/roles-exists.guard'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import {RolesAuthGuard} from '../auth/guards/roles-auth.guard'
 import {UpdateUserDto} from './dto/update-user.dto'
+import {UsuarioExistsGuard} from "../pedidos/guards/usuario-exists.guard";
+import {CreatePedidoDto} from "../pedidos/dto/create-pedido.dto";
+import {IdValidatePipe} from "../pedidos/pipes/id-validate.pipe";
+import {UpdatePedidoDto} from "../pedidos/dto/update-pedido.dto";
 
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cache
 @UseGuards(JwtAuthGuard) // Aplicar el guard aquí para autenticados con JWT
@@ -95,5 +99,38 @@ export class UsersController {
     @Get('me/pedidos')
     async getPedidos(@Req() request: any) {
         return await this.usersService.getPedidos(request.user.id)
+    }
+
+    @Get('me/pedidos/:id')
+    async getPedido(@Req() request: any, @Param('id', IdValidatePipe) id: string) {
+        return await this.usersService.getPedido(request.user.id, id)
+    }
+
+    @Post('me/pedidos')
+    @HttpCode(201)
+    @UseGuards(UsuarioExistsGuard) // Aplicar el guard aquí
+    async createPedido(@Body() createPedidoDto: CreatePedidoDto, @Req() request: any) {
+        this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
+        return await this.usersService.createPedido(createPedidoDto, request.user.id)
+    }
+
+    @Put('me/pedidos/:id')
+    @UseGuards(UsuarioExistsGuard) // Aplicar el guard aquí
+    async updatePedido(
+        @Param('id', IdValidatePipe) id: string,
+        @Body() updatePedidoDto: UpdatePedidoDto,
+        @Req() request: any
+    ) {
+        this.logger.log(
+            `Actualizando pedido con id ${id} y ${JSON.stringify(updatePedidoDto)}`,
+        )
+        return await this.usersService.updatePedido(id, updatePedidoDto, request.user.id)
+    }
+
+    @Delete('me/pedidos/:id')
+    @HttpCode(204)
+    async removePedido(@Param('id', IdValidatePipe) id: string, @Req() request: any) {
+        this.logger.log(`Eliminando pedido con id ${id}`)
+        await this.usersService.removePedido(id, request.user.id)
     }
 }

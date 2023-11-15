@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, Logger, NotFoundException,} from '@nestjs/common'
+import {BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException,} from '@nestjs/common'
 import {InjectRepository} from '@nestjs/typeorm'
 import {Repository} from 'typeorm'
 import {Usuario} from './entities/user.entity'
@@ -8,6 +8,8 @@ import {Role, UserRole} from './entities/user-role.entity'
 import {BcryptService} from './bcrypt.service'
 import {UpdateUserDto} from './dto/update-user.dto'
 import {PedidosService} from "../pedidos/pedidos.service";
+import {CreatePedidoDto} from "../pedidos/dto/create-pedido.dto";
+import {UpdatePedidoDto} from "../pedidos/dto/update-pedido.dto";
 
 @Injectable()
 export class UsersService {
@@ -157,6 +159,47 @@ export class UsersService {
 
     async getPedidos(id: number) {
         return await this.pedidosService.getPedidosByUser(id)
+    }
+
+    async getPedido(idUser: number, idPedido: string) {
+        const pedido = await this.pedidosService.findOne(idPedido)
+        console.log(pedido.idUsuario)
+        console.log(idUser)
+        if (pedido.idUsuario != idUser) {
+            throw new ForbiddenException('Do not have permission to access this resource')
+        }
+        return pedido
+    }
+
+    async createPedido(createPedidoDto: CreatePedidoDto, userId: number) {
+        this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
+        if (createPedidoDto.idUsuario != userId) {
+            throw new BadRequestException('Producto idUsuario must be the same as the authenticated user')
+        }
+        return await this.pedidosService.create(createPedidoDto)
+    }
+
+    async updatePedido(id: string, updatePedidoDto: UpdatePedidoDto, userId: number) {
+        this.logger.log(
+            `Actualizando pedido con id ${id} y ${JSON.stringify(updatePedidoDto)}`,
+        )
+        if (updatePedidoDto.idUsuario != userId) {
+            throw new BadRequestException('Producto idUsuario must be the same as the authenticated user')
+        }
+        const pedido = await this.pedidosService.findOne(id)
+        if (pedido.idUsuario != userId) {
+            throw new ForbiddenException('Do not have permission to access this resource')
+        }
+        return await this.pedidosService.update(id, updatePedidoDto)
+    }
+
+    async removePedido(idPedido: string, userId: number) {
+        this.logger.log(`removePedido: ${idPedido}`)
+        const pedido = await this.pedidosService.findOne(idPedido)
+        if (pedido.idUsuario != userId) {
+            throw new ForbiddenException('Do not have permission to access this resource')
+        }
+        return await this.pedidosService.remove(idPedido)
     }
 
     private async findByEmail(email: string) {

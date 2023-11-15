@@ -836,8 +836,8 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:3000/v1/users/me/pedidos",
-											"protocol": "https",
+											"raw": "http://localhost:3000/v1/users/me/pedidos",
+											"protocol": "http",
 											"host": [
 												"localhost"
 											],
@@ -858,8 +858,8 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:3000/v1/users/me/pedidos/65376a9522702a195b2d983d",
-											"protocol": "https",
+											"raw": "http://localhost:3000/v1/users/me/pedidos/6536518de9b0d305f193b5ef",
+											"protocol": "http",
 											"host": [
 												"localhost"
 											],
@@ -869,7 +869,7 @@
 												"users",
 												"me",
 												"pedidos",
-												"65376a9522702a195b2d983d"
+												"6536518de9b0d305f193b5ef"
 											]
 										}
 									},
@@ -890,8 +890,8 @@
 											}
 										},
 										"url": {
-											"raw": "https://localhost:3000/v1/users/me/pedidos",
-											"protocol": "https",
+											"raw": "http://localhost:3000/v1/users/me/pedidos",
+											"protocol": "http",
 											"host": [
 												"localhost"
 											],
@@ -913,7 +913,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"idUsuario\": 1,\r\n    \"cliente\": {\r\n        \"nombreCompleto\": \"Juan Perez\",\r\n        \"email\": \"juanperez@gmail.com\",\r\n        \"telefono\": \"+34123456789\",\r\n        \"direccion\": {\r\n            \"calle\": \"Calle Mayor\",\r\n            \"numero\": \"10\",\r\n            \"ciudad\": \"Madrid\",\r\n            \"provincia\": \"Madrid\",\r\n            \"pais\": \"España\",\r\n            \"codigoPostal\": \"28001\"\r\n        }\r\n    },\r\n    \"lineasPedido\": [\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\r\n            \"idProducto\": 2,\r\n            \"precioProducto\": 19.99,\r\n            \"cantidad\": 1\r\n        },\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174002\",\r\n            \"idProducto\": 3,\r\n            \"precioProducto\": 15.99,\r\n            \"cantidad\": 2\r\n        }\r\n    ]\r\n}\r\n",
+											"raw": "{\r\n    \"idUsuario\": 2,\r\n    \"cliente\": {\r\n        \"nombreCompleto\": \"Juan Perez\",\r\n        \"email\": \"juanperez@gmail.com\",\r\n        \"telefono\": \"+34123456789\",\r\n        \"direccion\": {\r\n            \"calle\": \"Calle Mayor\",\r\n            \"numero\": \"10\",\r\n            \"ciudad\": \"Madrid\",\r\n            \"provincia\": \"Madrid\",\r\n            \"pais\": \"España\",\r\n            \"codigoPostal\": \"28001\"\r\n        }\r\n    },\r\n    \"lineasPedido\": [\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\r\n            \"idProducto\": 2,\r\n            \"precioProducto\": 19.99,\r\n            \"cantidad\": 1\r\n        },\r\n        {\r\n            \"id\": \"123e4567-e89b-12d3-a456-426614174002\",\r\n            \"idProducto\": 3,\r\n            \"precioProducto\": 15.99,\r\n            \"cantidad\": 2\r\n        }\r\n    ]\r\n}\r\n",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -921,8 +921,8 @@
 											}
 										},
 										"url": {
-											"raw": "https://localhost:3000/v1/users/me/pedidos/6542c2c94efd947500a5a23e",
-											"protocol": "https",
+											"raw": "http://localhost:3000/v1/users/me/pedidos/6536518de9b0d305f193b5ef",
+											"protocol": "http",
 											"host": [
 												"localhost"
 											],
@@ -932,7 +932,7 @@
 												"users",
 												"me",
 												"pedidos",
-												"6542c2c94efd947500a5a23e"
+												"6536518de9b0d305f193b5ef"
 											]
 										}
 									},
@@ -1128,7 +1128,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3MDAwNjMyODUsImV4cCI6MTcwMDA2Njg4NX0.tdwhFkUjDGKv8wlVqIwTGfJmxGkic3FWipKp1QjGBSPOvr1A6pBIRu3sHNwJiR5vHQT8TvN-_E0nktNGfC04iA",
+				"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3MDAwNjk2NTIsImV4cCI6MTcwMDA3MzI1Mn0.QpGRaSBB2HaF5JOEaqSVld4fJDH3QAM1_g5_qctFmLZxSC1eKOnAQa_YH1KSt1j7xQLe_HmEJ5lTKdX1o2fhzA",
 				"type": "string"
 			}
 		]
