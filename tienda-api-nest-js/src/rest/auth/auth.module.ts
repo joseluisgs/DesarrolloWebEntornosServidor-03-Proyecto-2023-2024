@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller'
 import { UsersModule } from '../users/users.module'
 import { AuthMapper } from './mappers/usuarios.mapper'
 import { JwtModule } from '@nestjs/jwt'
+import * as process from 'process'
 
 @Module({
   imports: [

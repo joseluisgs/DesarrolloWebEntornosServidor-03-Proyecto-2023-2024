@@ -36,34 +36,31 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     this.logger.log('create')
-    // Validamos que el username no exista
-    const userByUsername = await this.findByUsername(createUserDto.username)
-    if (userByUsername) {
+    // Validamos que el username no exista y no exista email en la base de datos
+    const existingUser = await Promise.all([
+      this.findByUsername(createUserDto.username),
+      this.findByEmail(createUserDto.email),
+    ])
+    if (existingUser[0]) {
       throw new BadRequestException('username already exists')
     }
-    // Validamos que el email no exista
-    const userByEmail = await this.findByEmail(createUserDto.email)
-    if (userByEmail) {
+
+    if (existingUser[1]) {
       throw new BadRequestException('email already exists')
     }
     const hashPassword = await this.bcryptService.hash(createUserDto.password)
+
     // necesito insertar el usuario en la tabla de usuarios y luego en la tabla de roles
     const usuario = this.usuariosMapper.toEntity(createUserDto)
     usuario.password = hashPassword
     const user = await this.usuariosRepository.save(usuario)
-    // Si no tiene roles, le asignamos el rol de usuario
-    if (!createUserDto.roles) {
-      createUserDto.roles = [Role.USER]
-    }
-    // insertamos todos los roles del usuario en la tabla de roles con el id del usuario y el rol
-    const roles = createUserDto.roles.map((role) => {
-      const userRole = new UserRole()
-      userRole.usuario = user
-      userRole.role = Role[role]
-      return userRole
-    })
-    const userRoles = await this.userRoleRepository.save(roles)
-    return this.usuariosMapper.toResponseDtoWithRoles(user, userRoles)
+    // Si no tiene roles, le asignamos el rol de usuario y lo guardamos en la tabla de roles
+    const roles = createUserDto.roles || [Role.USER]
+    const userRoles = roles.map((role) => ({ usuario: user, role: Role[role] }))
+    const savedUserRoles = await this.userRoleRepository.save(userRoles)
+
+    // Devolvemos el usuario con los roles
+    return this.usuariosMapper.toResponseDtoWithRoles(user, savedUserRoles)
   }
 
   // Método para indicar si el una aray de roles de tipo string estan en el enum de roles de usuario
@@ -71,9 +68,14 @@ export class UsersService {
     return roles.every((role) => Role[role])
   }
 
-  private async findByUsername(username: string) {
+  async findByUsername(username: string) {
     this.logger.log(`findByUsername: ${username}`)
     return await this.usuariosRepository.findOneBy({ username })
+  }
+
+  async validatePassword(password: string, hashPassword: string) {
+    this.logger.log(`validatePassword`)
+    return await this.bcryptService.isMatch(password, hashPassword)
   }
 
   private async findByEmail(email: string) {

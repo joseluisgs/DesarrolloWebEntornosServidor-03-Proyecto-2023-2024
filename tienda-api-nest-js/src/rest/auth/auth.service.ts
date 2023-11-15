@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -7,7 +8,6 @@ import { UserSignUpDto } from './dto/user-sign.up.dto'
 import { UserSignInDto } from './dto/user-sign.in.dto'
 import { UsersService } from '../users/users.service'
 import { AuthMapper } from './mappers/usuarios.mapper'
-import { UserDto } from '../users/dto/user-response.dto'
 import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
@@ -26,21 +26,30 @@ export class AuthService {
     const user = await this.usersService.create(
       this.authMapper.toCreateDto(userSignUpDto),
     )
-    return this.getAccessToken(user)
+    return this.getAccessToken(user.id)
   }
 
   async singIn(userSignInDto: UserSignInDto) {
     this.logger.log(`singIn ${userSignInDto.username}`)
-    return userSignInDto
+    const user = await this.usersService.findByUsername(userSignInDto.username)
+    if (!user) {
+      throw new BadRequestException('username or password are invalid')
+    }
+    const isValidPassword = await this.usersService.validatePassword(
+      userSignInDto.password, // plain
+      user.password, // hash
+    )
+    if (!isValidPassword) {
+      throw new BadRequestException('username or password are invalid')
+    }
+    return this.getAccessToken(user.id)
   }
 
-  // TODO!!!
-
-  private getAccessToken(userDto: UserDto) {
-    this.logger.log(`getAccessToken ${userDto.username}`)
+  private getAccessToken(userId: number) {
+    this.logger.log(`getAccessToken ${userId}`)
     try {
       const payload = {
-        id: userDto.id,
+        id: userId,
       }
       //console.log(payload)
       const access_token = this.jwtService.sign(payload)

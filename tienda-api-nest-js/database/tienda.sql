@@ -70,8 +70,8 @@ INSERT INTO "user_roles" ("user_id", "role", "id") VALUES
                                                        (1,	'USER',	1),
                                                        (1,	'ADMIN',	2),
                                                        (2,	'USER',	3),
-                                                       (2,	'USER',	4),
-                                                       (3,	'USER',	5);
+                                                       (3,	'USER',	4),
+                                                       (4,	'USER',	5);
 
 DROP TABLE IF EXISTS "usuarios";
 DROP SEQUENCE IF EXISTS usuarios_id_seq;
