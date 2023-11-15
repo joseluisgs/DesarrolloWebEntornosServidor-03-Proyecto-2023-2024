@@ -1,9 +1,10 @@
 SELECT 'CREATE DATABASE nombre_de_la_base_de_datos'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'tienda');
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'tienda');
 
 DROP TABLE IF EXISTS "productos";
 DROP SEQUENCE IF EXISTS productos_id_seq;
 DROP TABLE IF EXISTS "user_roles";
+DROP SEQUENCE IF EXISTS user_roles_id_seq;
 DROP TABLE IF EXISTS "usuarios";
 DROP SEQUENCE IF EXISTS usuarios_id_seq;
 DROP TABLE IF EXISTS "categorias";
@@ -48,18 +49,6 @@ VALUES ('f', 10.99, 5, '2023-11-02 11:43:24.722473', 1, '2023-11-02 11:43:24.722
         'https://via.placeholder.com/150', 'Adidas', 'Modelo5');
 
 
-CREATE TABLE "public"."user_roles"
-(
-    "user_id" bigint NOT NULL,
-    "roles"   character varying(255)
-) WITH (oids = false);
-
-INSERT INTO "user_roles" ("user_id", "roles")
-VALUES (1, 'USER'),
-       (1, 'ADMIN'),
-       (2, 'USER'),
-       (2, 'USER'),
-       (3, 'USER');
 
 CREATE SEQUENCE usuarios_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 5 CACHE 1;
 
@@ -89,6 +78,24 @@ VALUES ('f', '2023-11-02 11:43:24.724871', 1, '2023-11-02 11:43:24.724871', 'Adm
         '$2a$10$Pd1yyq2NowcsDf4Cpf/ZXObYFkcycswqHAqBndE1wWJvYwRxlb.Pu', 'test'),
        ('f', '2023-11-02 11:43:24.736674', 4, '2023-11-02 11:43:24.736674', 'Otro Otro', 'otro@prueba.net', 'otro',
         '$2a$12$3Q4.UZbvBMBEvIwwjGEjae/zrIr6S50NusUlBcCNmBd2382eyU0bS', 'otro');
+
+
+CREATE SEQUENCE user_roles_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 6 CACHE 1;
+CREATE TABLE "public"."user_roles"
+(
+    "id"      bigint    DEFAULT nextval('user_roles_id_seq') NOT NULL,
+    "user_id" bigint NOT NULL,
+    "role"   character varying(255) NOT NULL,
+    CONSTRAINT "user_roles_pkey" PRIMARY KEY ("id"),
+    FOREIGN KEY ("user_id") REFERENCES "usuarios" ("id")
+) WITH (oids = false);
+
+INSERT INTO "user_roles"("id","user_id", "role")
+VALUES (1, 1, 'USER'),
+       (2, 1, 'ADMIN'),
+       (3, 2, 'USER'),
+       (4, 2, 'USER'),
+       (5, 3, 'USER');
 
 
 CREATE TABLE "public"."categorias"

@@ -17,7 +17,8 @@ export class UserRole {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  // Lo almaceno como varchar porque es más fácil de leer
+  @Column({ type: 'varchar', length: 50, nullable: false, default: Role.USER })
   role: Role
 
   @ManyToOne(() => Usuario, (user) => user.roles)

@@ -10,7 +10,7 @@ import { UserRole } from './user-role.entity'
 
 @Entity({ name: 'usuarios' }) // Nombre de la tabla (es case sensitive!!!)
 export class Usuario {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' }) // Autoincremental, le pongo bigint porque en postgresql el tipo serial es bigint
   id: number
 
   @Column({ type: 'varchar', length: 255, nullable: false })
