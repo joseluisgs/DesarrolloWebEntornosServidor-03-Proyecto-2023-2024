@@ -23,7 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { extname, parse } from 'path'
 import { Request } from 'express'
-import { ProductoExistsGuard } from './guards/producto-id/producto-exists-guard'
+import { ProductoExistsGuard } from './guards/producto-exists.guard'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 
