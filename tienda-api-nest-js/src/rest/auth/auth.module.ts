@@ -5,6 +5,8 @@ import { UsersModule } from '../users/users.module'
 import { AuthMapper } from './mappers/usuarios.mapper'
 import { JwtModule } from '@nestjs/jwt'
 import * as process from 'process'
+import { PassportModule } from '@nestjs/passport'
+import { JwtAuthStrategy } from './strategies/jwt-strategy'
 
 @Module({
   imports: [
@@ -21,9 +23,12 @@ import * as process from 'process'
         algorithm: 'HS512', // Algoritmo de encriptacion
       },
     }),
+    // Importamos el módulo de passport con las estrategias
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    // Importamos el módulo de usuarios porque usaremos su servicio
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthMapper],
+  providers: [AuthService, AuthMapper, JwtAuthStrategy],
 })
 export class AuthModule {}

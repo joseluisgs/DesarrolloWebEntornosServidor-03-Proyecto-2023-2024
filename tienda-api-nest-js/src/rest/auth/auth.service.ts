@@ -45,6 +45,11 @@ export class AuthService {
     return this.getAccessToken(user.id)
   }
 
+  async validateUser(id: number) {
+    this.logger.log(`validateUser ${id}`)
+    return await this.usersService.findOne(id)
+  }
+
   private getAccessToken(userId: number) {
     this.logger.log(`getAccessToken ${userId}`)
     try {

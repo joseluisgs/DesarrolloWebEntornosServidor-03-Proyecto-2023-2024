@@ -8,7 +8,7 @@ import { CacheModule } from '@nestjs/cache-manager'
 import { DatabaseModule } from './config/database/database.module'
 import { PedidosModule } from './rest/pedidos/pedidos.module'
 import { AuthModule } from './rest/auth/auth.module'
-import { UsersModule } from './rest/users/users.module';
+import { UsersModule } from './rest/users/users.module'
 
 @Module({
   imports: [
@@ -16,13 +16,13 @@ import { UsersModule } from './rest/users/users.module';
     ConfigModule.forRoot(),
     DatabaseModule, // Configurar el módulo de base de datos
     CacheModule.register(), // Configurar el módulo de caché
+    AuthModule, // Inyectamos el modulo de autenticacion (JWT y Guards)
     // Luego se cargan los módulos de la aplicación
     ProductosModule,
     CategoriasModule,
     StorageModule,
     NotificationsModule,
     PedidosModule,
-    AuthModule,
     UsersModule,
   ],
   providers: [],

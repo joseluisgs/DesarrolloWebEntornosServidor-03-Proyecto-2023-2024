@@ -12,8 +12,11 @@ import { UsersService } from './users.service'
 import { CacheInterceptor } from '@nestjs/cache-manager'
 import { CreateUserDto } from './dto/create-user.dto'
 import { RolesExistsGuard } from './guards/roles-exists.guard'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { RolesAuthGuard } from '../auth/guards/roles-auth.guard'
 
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cache
+@UseGuards(JwtAuthGuard) // Aplicar el guard aquí para autenticados con JWT
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name)
@@ -21,6 +24,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(new RolesAuthGuard('ADMIN')) // Aplicar el guard aquí para usuarios con rol ADMIN
   async findAll() {
     this.logger.log('findAll')
     return await this.usersService.findAll()
