@@ -19,8 +19,9 @@ export class UserSignUpDto {
 
   @IsString({ message: 'Password no es válido' })
   @IsNotEmpty({ message: 'Password no puede estar vacío' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$/, {
-    message: 'Password no es válido',
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
+    message:
+      'Password no es válido, debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número',
   })
   password: string
 }

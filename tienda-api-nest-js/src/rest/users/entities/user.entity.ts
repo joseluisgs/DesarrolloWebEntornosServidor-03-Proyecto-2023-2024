@@ -9,7 +9,7 @@ import {
 import { UserRole } from './user-role.entity'
 
 @Entity({ name: 'usuarios' })
-export class Usuario {
+export class User {
   @PrimaryGeneratedColumn()
   id: number
 

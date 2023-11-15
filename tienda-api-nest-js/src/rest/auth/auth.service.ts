@@ -1,26 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, Logger } from '@nestjs/common'
+import { UserSignUpDto } from './dto/user-sign.up.dto'
+import { UserSignInDto } from './dto/user-sign.in.dto'
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  private readonly logger = new Logger(AuthService.name)
+
+  async singUp(userSignUpDto: UserSignUpDto) {
+    this.logger.log(`singUp ${userSignUpDto.username}`)
+    return userSignUpDto
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async singIn(userSignInDto: UserSignInDto) {
+    this.logger.log(`singIn ${userSignInDto.username}`)
+    return userSignInDto
   }
 }
