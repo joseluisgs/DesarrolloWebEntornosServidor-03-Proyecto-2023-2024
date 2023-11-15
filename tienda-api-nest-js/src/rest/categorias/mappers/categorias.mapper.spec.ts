@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { CategoriasMapper } from './categorias.mapper'
-import { CategoriaEntity } from '../../entities/categoria.entity'
-import { CreateCategoriaDto } from '../../dto/create-categoria.dto'
-import { UpdateCategoriaDto } from '../../dto/update-categoria.dto'
+import { CategoriaEntity } from '../entities/categoria.entity'
+import { CreateCategoriaDto } from '../dto/create-categoria.dto'
+import { UpdateCategoriaDto } from '../dto/update-categoria.dto'
 
 describe('CategoriasMapper', () => {
   let provider: CategoriasMapper

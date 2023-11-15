@@ -5,14 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Usuario } from './entities/user.entity'
 import { UserRole } from './entities/user-role.entity'
 import { UsuariosMapper } from './mappers/usuarios.mapper'
+import { CacheModule } from '@nestjs/cache-manager'
+import { BcryptService } from './bcrypt.service'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Usuario]), // Importamos el repositorio de usuarios
     TypeOrmModule.forFeature([UserRole]), // Importamos el repositorio de roles
+    CacheModule.register(), // Importamos el módulo de cache
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsuariosMapper],
+  providers: [UsersService, UsuariosMapper, BcryptService],
   exports: [UsersService],
 })
 export class UsersModule {}

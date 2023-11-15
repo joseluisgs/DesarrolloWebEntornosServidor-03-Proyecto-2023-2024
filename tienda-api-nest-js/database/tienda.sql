@@ -30,7 +30,7 @@ INSERT INTO "categorias" ("is_deleted", "created_at", "updated_at", "id", "nombr
 
 DROP TABLE IF EXISTS "productos";
 DROP SEQUENCE IF EXISTS productos_id_seq;
-CREATE SEQUENCE productos_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1;
+CREATE SEQUENCE productos_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 6 CACHE 1;
 
 CREATE TABLE "public"."productos" (
                                       "is_deleted" boolean DEFAULT false NOT NULL,
@@ -57,7 +57,7 @@ INSERT INTO "productos" ("is_deleted", "precio", "stock", "created_at", "id", "u
 
 DROP TABLE IF EXISTS "user_roles";
 DROP SEQUENCE IF EXISTS user_roles_id_seq;
-CREATE SEQUENCE user_roles_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 5 CACHE 1;
+CREATE SEQUENCE user_roles_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 6 CACHE 1;
 
 CREATE TABLE "public"."user_roles" (
                                        "user_id" bigint,
@@ -75,7 +75,7 @@ INSERT INTO "user_roles" ("user_id", "role", "id") VALUES
 
 DROP TABLE IF EXISTS "usuarios";
 DROP SEQUENCE IF EXISTS usuarios_id_seq;
-CREATE SEQUENCE usuarios_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1;
+CREATE SEQUENCE usuarios_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 5 CACHE 1;
 
 CREATE TABLE "public"."usuarios" (
                                      "is_deleted" boolean DEFAULT false NOT NULL,

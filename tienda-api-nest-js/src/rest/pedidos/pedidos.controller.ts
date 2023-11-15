@@ -11,6 +11,7 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common'
 import { UpdatePedidoDto } from './dto/update-pedido.dto'
 import { CreatePedidoDto } from './dto/create-pedido.dto'
@@ -18,8 +19,10 @@ import { OrderByValidatePipe } from './pipes/orderby-validate.pipe'
 import { PedidosService } from './pedidos.service'
 import { OrderValidatePipe } from './pipes/order-validate.pipe'
 import { IdValidatePipe } from './pipes/id-validate.pipe'
+import { CacheInterceptor } from '@nestjs/cache-manager'
 
 @Controller('pedidos')
+@UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cache
 export class PedidosController {
   private readonly logger = new Logger(PedidosController.name)
 
