@@ -1,6 +1,14 @@
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator'
 
 export class UserSignUpDto {
+  @IsNotEmpty({ message: 'Nombre no puede estar vacío' })
+  @IsString({ message: 'Nombre no es válido' })
+  nombre: string
+
+  @IsNotEmpty({ message: 'Apellidos no puede estar vacío' })
+  @IsString({ message: 'Apellidos no es válido' })
+  apellidos: string
+
   @IsNotEmpty({ message: 'Username no puede estar vacío' })
   @IsString({ message: 'Username no es válido' })
   username: string
@@ -11,7 +19,7 @@ export class UserSignUpDto {
 
   @IsString({ message: 'Password no es válido' })
   @IsNotEmpty({ message: 'Password no puede estar vacío' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$/, {
     message: 'Password no es válido',
   })
   password: string

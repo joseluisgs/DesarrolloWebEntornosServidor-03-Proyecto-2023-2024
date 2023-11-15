@@ -6,8 +6,9 @@ import { StorageModule } from './rest/storage/storage.module'
 import { NotificationsModule } from './websockets/notifications/notifications.module'
 import { CacheModule } from '@nestjs/cache-manager'
 import { DatabaseModule } from './config/database/database.module'
-import { PedidosModule } from './rest/pedidos/pedidos.module';
-import { AuthModule } from './rest/auth/auth.module';
+import { PedidosModule } from './rest/pedidos/pedidos.module'
+import { AuthModule } from './rest/auth/auth.module'
+import { UsersModule } from './rest/users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +23,8 @@ import { AuthModule } from './rest/auth/auth.module';
     NotificationsModule,
     PedidosModule,
     AuthModule,
+    UsersModule,
   ],
+  providers: [],
 })
 export class AppModule {}
