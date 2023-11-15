@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { User } from './user.entity'
+import { Usuario } from './user.entity'
 
 export enum Role {
   USER = 'USER',
@@ -17,13 +17,10 @@ export class UserRole {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ name: 'user_id' })
-  userId: number
-
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role
 
-  @ManyToOne(() => User, (user) => user.roles)
+  @ManyToOne(() => Usuario, (user) => user.roles)
   @JoinColumn({ name: 'user_id' })
-  usuario: User
+  usuario: Usuario
 }

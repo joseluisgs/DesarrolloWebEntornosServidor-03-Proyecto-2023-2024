@@ -8,8 +8,8 @@ import {
 } from 'typeorm'
 import { UserRole } from './user-role.entity'
 
-@Entity({ name: 'usuarios' })
-export class User {
+@Entity({ name: 'usuarios' }) // Nombre de la tabla (es case sensitive!!!)
+export class Usuario {
   @PrimaryGeneratedColumn()
   id: number
 
@@ -22,10 +22,10 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   email: string
 
-  @Column({ unique: true })
+  @Column({ unique: true, length: 255, nullable: false })
   username: string
 
-  @Column()
+  @Column({ type: 'varchar', length: 255, nullable: false })
   password: string
 
   @CreateDateColumn({
