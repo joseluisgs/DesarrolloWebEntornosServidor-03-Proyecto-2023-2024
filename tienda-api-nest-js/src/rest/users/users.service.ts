@@ -50,9 +50,11 @@ export class UsersService {
     // necesito insertar el usuario en la tabla de usuarios y luego en la tabla de roles
     const usuario = this.usuariosMapper.toEntity(createUserDto)
     usuario.password = hashPassword
-    console.log(usuario)
     const user = await this.usuariosRepository.save(usuario)
-    console.log(user)
+    // Si no tiene roles, le asignamos el rol de usuario
+    if (!createUserDto.roles) {
+      createUserDto.roles = [Role.USER]
+    }
     // insertamos todos los roles del usuario en la tabla de roles con el id del usuario y el rol
     const roles = createUserDto.roles.map((role) => {
       const userRole = new UserRole()
