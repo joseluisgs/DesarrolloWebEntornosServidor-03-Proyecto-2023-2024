@@ -1003,7 +1003,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:3000/v1/users/3",
+									"raw": "http://localhost:3000/v1/users/2",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1012,7 +1012,7 @@
 									"path": [
 										"v1",
 										"users",
-										"3"
+										"2"
 									]
 								}
 							},
@@ -1054,7 +1054,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"nombre\": \"{{$randomFirstName}}\",\r\n    \"apellidos\": \"{{$randomLastName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"username\": \"update\",\r\n    \"password\": \"update\",\r\n    \"roles\": [\r\n        \"USER\",\r\n        \"ADMIN\"\r\n    ]\r\n}",
+									"raw": "{\r\n    \"nombre\": \"{{$randomFirstName}}\",\r\n    \"apellidos\": \"{{$randomLastName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"roles\": [\r\n        \"USER\"\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1062,8 +1062,8 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:3000/v1/users/2",
-									"protocol": "https",
+									"raw": "http://localhost:3000/v1/users/2",
+									"protocol": "http",
 									"host": [
 										"localhost"
 									],
@@ -1083,8 +1083,8 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:3000/v1/users/3",
-									"protocol": "https",
+									"raw": "http://localhost:3000/v1/users/1",
+									"protocol": "http",
 									"host": [
 										"localhost"
 									],
@@ -1092,7 +1092,7 @@
 									"path": [
 										"v1",
 										"users",
-										"3"
+										"1"
 									]
 								}
 							},
@@ -1128,7 +1128,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3MDAwNTY3MDgsImV4cCI6MTcwMDA2MDMwOH0.raW981tUZ2Booy38MXjXCBeSaW8pZ58YxaT6lwKP0IXrX1ONLi9KrtIF4sxi3lKo_AJl6fIlf02ZGDSjs9I6Ng",
+				"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3MDAwNjMyODUsImV4cCI6MTcwMDA2Njg4NX0.tdwhFkUjDGKv8wlVqIwTGfJmxGkic3FWipKp1QjGBSPOvr1A6pBIRu3sHNwJiR5vHQT8TvN-_E0nktNGfC04iA",
 				"type": "string"
 			}
 		]
