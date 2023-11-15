@@ -92,4 +92,8 @@ export class UsersController {
     }
 
     // ME/PEDIDOS, CUALQUIER USUARIO AUTENTICADO siempre y cuando el id del usuario coincida con el id del pedido
+    @Get('me/pedidos')
+    async getPedidos(@Req() request: any) {
+        return await this.usersService.getPedidos(request.user.id)
+    }
 }

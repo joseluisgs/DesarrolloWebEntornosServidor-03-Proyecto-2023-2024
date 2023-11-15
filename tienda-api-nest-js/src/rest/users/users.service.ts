@@ -6,10 +6,8 @@ import {UsuariosMapper} from './mappers/usuarios.mapper'
 import {CreateUserDto} from './dto/create-user.dto'
 import {Role, UserRole} from './entities/user-role.entity'
 import {BcryptService} from './bcrypt.service'
-import {InjectModel} from '@nestjs/mongoose'
-import {Pedido, PedidoDocument} from '../pedidos/schemas/pedido.schema'
-import {PaginateModel} from 'mongoose'
 import {UpdateUserDto} from './dto/update-user.dto'
+import {PedidosService} from "../pedidos/pedidos.service";
 
 @Injectable()
 export class UsersService {
@@ -20,10 +18,9 @@ export class UsersService {
         private readonly usuariosRepository: Repository<Usuario>,
         @InjectRepository(UserRole)
         private readonly userRoleRepository: Repository<UserRole>,
+        private readonly pedidosService: PedidosService,
         private readonly usuariosMapper: UsuariosMapper,
         private readonly bcryptService: BcryptService,
-        @InjectModel(Pedido.name)
-        private pedidosRepository: PaginateModel<PedidoDocument>,
     ) {
     }
 
@@ -91,9 +88,7 @@ export class UsersService {
         if (!user) {
             throw new NotFoundException(`User not found with id ${idUser}`)
         }
-        const existsPedidos = await this.pedidosRepository.exists({
-            idUsuario: user.id,
-        })
+        const existsPedidos = await this.pedidosService.userExists(user.id)
         // Si existen pedidos, hacemos borrado logico
         if (existsPedidos) {
             user.updatedAt = new Date()
@@ -158,6 +153,10 @@ export class UsersService {
 
         // Devolver los datos mappeados
         return this.usuariosMapper.toResponseDto(updatedUser)
+    }
+
+    async getPedidos(id: number) {
+        return await this.pedidosService.getPedidosByUser(id)
     }
 
     private async findByEmail(email: string) {
