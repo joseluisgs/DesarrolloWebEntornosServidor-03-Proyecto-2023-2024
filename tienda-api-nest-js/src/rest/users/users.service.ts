@@ -1,16 +1,30 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { Usuario } from './entities/user.entity'
+import { UsuariosMapper } from './mappers/usuarios.mapper'
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name)
 
-  findAll() {
+  constructor(
+    @InjectRepository(Usuario)
+    private readonly usuariosRepository: Repository<Usuario>,
+    private readonly usuariosMapper: UsuariosMapper,
+  ) {}
+
+  async findAll() {
     this.logger.log('findAll')
-    return `This action returns all users`
+    return (await this.usuariosRepository.find()).map((u) =>
+      this.usuariosMapper.toResponseDto(u),
+    )
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     this.logger.log(`findOne: ${id}`)
-    return `This action returns a #${id} user`
+    return this.usuariosMapper.toResponseDto(
+      await this.usuariosRepository.findOneBy({ id }),
+    )
   }
 }

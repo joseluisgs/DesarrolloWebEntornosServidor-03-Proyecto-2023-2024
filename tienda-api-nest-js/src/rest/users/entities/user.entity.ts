@@ -46,6 +46,11 @@ export class Usuario {
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean
 
+  // Con el eager: true, cuando hagamos un find, nos traerá también los roles ahorrando una consulta (compo hicimos en producto con la categoría)
   @OneToMany(() => UserRole, (userRole) => userRole.usuario, { eager: true })
   roles: UserRole[]
+
+  get roleNames(): string[] {
+    return this.roles.map((role) => role.role)
+  }
 }

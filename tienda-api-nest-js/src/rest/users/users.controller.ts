@@ -8,14 +8,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     this.logger.log('findAll')
-    return this.usersService.findAll()
+    return await this.usersService.findAll()
   }
 
   @Get(':id')
-  findOne(id: number) {
+  async findOne(id: number) {
     this.logger.log(`findOne: ${id}`)
-    return this.usersService.findOne(id)
+    return await this.usersService.findOne(id)
   }
 }

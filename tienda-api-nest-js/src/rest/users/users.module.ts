@@ -4,6 +4,7 @@ import { UsersController } from './users.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Usuario } from './entities/user.entity'
 import { UserRole } from './entities/user-role.entity'
+import { UsuariosMapper } from './mappers/usuarios.mapper'
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { UserRole } from './entities/user-role.entity'
     TypeOrmModule.forFeature([UserRole]), // Importamos el repositorio de roles
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, UsuariosMapper],
   exports: [UsersService],
 })
 export class UsersModule {}
