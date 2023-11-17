@@ -31,13 +31,14 @@ export class CategoriasController {
   @Get()
   @CacheKey('all_categories')
   @CacheTTL(30)
-  @Roles('ADMIN')
+  @Roles('USER')
   async findAll(@Paginate() query: PaginateQuery) {
     this.logger.log('Find all categorias')
     return await this.categoriasService.findAll(query)
   }
 
   @Get(':id')
+  @Roles('USER')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     this.logger.log(`Find one categoria by id:${id}`)
     return await this.categoriasService.findOne(id)
