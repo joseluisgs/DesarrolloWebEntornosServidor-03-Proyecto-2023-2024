@@ -1,8 +1,8 @@
-# DesarrolloWebEntornosServidor-02-Proyecto-2023-2024
+# DesarrolloWebEntornosServidor-03-Proyecto-2023-2024
 
-Desarrollo Web en Entornos Servidor - 02 Programación de servicios y apps web en TypeScript/Node.js Proyecto. 2DAW. Curso 2023-2024
+Desarrollo Web en Entornos Servidor - 03 Programación de servicios y apps web en TypeScript/Node.js Proyecto. 2DAW. Curso 2023-2024
 
-- [DesarrolloWebEntornosServidor-02-Proyecto-2023-2024](#desarrollowebentornosservidor-02-proyecto-2023-2024)
+- [DesarrolloWebEntornosServidor-03-Proyecto-2023-2024](#desarrollowebentornosservidor-03-proyecto-2023-2024)
 - [Proyecto](#proyecto)
 - [Problema](#problema)
   - [Elementos del dominio](#elementos-del-dominio)
@@ -44,7 +44,7 @@ Vamos a crear una API REST y página web de una tienda de productos
 - Sabemos que todos los productos pertenecen a una categoría
 - Hay usuarios en el sistema, que pueden ser clientes o administradores
 - Los clientes hacen pedidos
-- Los pedidos esta formados por líeneas de pedidos
+- Los pedidos esta formados por líneas de pedidos
 - Cada línea de pedido está formada por un producto.
 
 ## Elementos del dominio
