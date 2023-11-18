@@ -26,6 +26,8 @@ import { Request } from 'express'
 import { ProductoExistsGuard } from './guards/producto-exists.guard'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { Roles, RolesAuthGuard } from '../auth/guards/roles-auth.guard'
 
 @Controller('productos')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
@@ -50,12 +52,16 @@ export class ProductosController {
 
   @Post()
   @HttpCode(201)
+  @UseGuards(JwtAuthGuard, RolesAuthGuard) // Aplicar el guard aquí
+  @Roles('ADMIN')
   async create(@Body() createProductoDto: CreateProductoDto) {
     this.logger.log(`Create producto ${createProductoDto}`)
     return await this.productosService.create(createProductoDto)
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard) // Aplicar el guard aquí
+  @Roles('ADMIN')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductoDto: UpdateProductoDto,
@@ -65,6 +71,8 @@ export class ProductosController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard) // Aplicar el guard aquí
+  @Roles('ADMIN')
   @HttpCode(204)
   async remove(@Param('id', ParseIntPipe) id: number) {
     this.logger.log('Remove producto with id:${id}')
@@ -75,6 +83,8 @@ export class ProductosController {
   }
 
   @Patch('/imagen/:id')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard) // Aplicar el guard aquí
+  @Roles('ADMIN')
   @UseGuards(ProductoExistsGuard) // Aplicar el guard aquí
   @UseInterceptors(
     FileInterceptor('file', {

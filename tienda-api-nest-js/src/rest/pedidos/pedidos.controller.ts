@@ -11,6 +11,8 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { UpdatePedidoDto } from './dto/update-pedido.dto'
 import { CreatePedidoDto } from './dto/create-pedido.dto'
@@ -18,14 +20,21 @@ import { OrderByValidatePipe } from './pipes/orderby-validate.pipe'
 import { PedidosService } from './pedidos.service'
 import { OrderValidatePipe } from './pipes/order-validate.pipe'
 import { IdValidatePipe } from './pipes/id-validate.pipe'
+import { CacheInterceptor } from '@nestjs/cache-manager'
+import { UsuarioExistsGuard } from './guards/usuario-exists.guard'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { Roles, RolesAuthGuard } from '../auth/guards/roles-auth.guard'
 
 @Controller('pedidos')
+@UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cache
+@UseGuards(JwtAuthGuard, RolesAuthGuard)
 export class PedidosController {
   private readonly logger = new Logger(PedidosController.name)
 
   constructor(private readonly pedidosService: PedidosService) {}
 
   @Get()
+  @Roles('ADMIN')
   async findAll(
     @Query('page', new DefaultValuePipe(1)) page: number = 1,
     @Query('limit', new DefaultValuePipe(20)) limit: number = 20,
@@ -46,12 +55,14 @@ export class PedidosController {
   }
 
   @Get(':id')
+  @Roles('ADMIN')
   async findOne(@Param('id', IdValidatePipe) id: string) {
     this.logger.log(`Buscando pedido con id ${id}`)
     return await this.pedidosService.findOne(id)
   }
 
   @Get('usuario/:idUsuario')
+  @Roles('ADMIN')
   async findPedidosPorUsuario(
     @Param('idUsuario', ParseIntPipe) idUsuario: number,
   ) {
@@ -60,13 +71,17 @@ export class PedidosController {
   }
 
   @Post()
+  @Roles('ADMIN')
   @HttpCode(201)
+  @UseGuards(UsuarioExistsGuard) // Aplicar el guard aquí
   async create(@Body() createPedidoDto: CreatePedidoDto) {
     this.logger.log(`Creando pedido ${JSON.stringify(createPedidoDto)}`)
     return await this.pedidosService.create(createPedidoDto)
   }
 
   @Put(':id')
+  @UseGuards(UsuarioExistsGuard) // Aplicar el guard aquí
+  @Roles('ADMIN')
   async update(
     @Param('id', IdValidatePipe) id: string,
     @Body() updatePedidoDto: UpdatePedidoDto,
@@ -79,6 +94,7 @@ export class PedidosController {
 
   @Delete(':id')
   @HttpCode(204)
+  @Roles('ADMIN')
   async remove(@Param('id', IdValidatePipe) id: string) {
     this.logger.log(`Eliminando pedido con id ${id}`)
     await this.pedidosService.remove(id)
