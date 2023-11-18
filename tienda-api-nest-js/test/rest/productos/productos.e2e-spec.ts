@@ -7,6 +7,8 @@ import { ProductosController } from '../../../src/rest/productos/productos.contr
 import { ProductosService } from '../../../src/rest/productos/productos.service'
 import { ResponseProductoDto } from '../../../src/rest/productos/dto/response-producto.dto'
 import { CacheModule } from '@nestjs/cache-manager'
+import { JwtAuthGuard } from '../../../src/rest/auth/guards/jwt-auth.guard'
+import { RolesAuthGuard } from '../../../src/rest/auth/guards/roles-auth.guard'
 
 // https://ualmtorres.github.io/SeminarioTesting/#truetests-end-to-end
 // https://blog.logrocket.com/end-end-testing-nestjs-typeorm/  <--- MUY BUENO
@@ -72,6 +74,10 @@ describe('ProductosController (e2e)', () => {
       // Pero ya se lo hemos inyectado arriba
       // .overrideProvider(ProductosService)
       // .useValue(mockProductosService)
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true }) // Esto permite que todas las solicitudes pasen el JwtAuthGuard
+      .overrideGuard(RolesAuthGuard)
+      .useValue({ canActivate: () => true })
       .compile()
 
     app = moduleFixture.createNestApplication()

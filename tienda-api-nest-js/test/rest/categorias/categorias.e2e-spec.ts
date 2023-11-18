@@ -5,6 +5,8 @@ import { CategoriaEntity } from '../../../src/rest/categorias/entities/categoria
 import * as request from 'supertest'
 import { CategoriasController } from '../../../src/rest/categorias/categorias.controller'
 import { CacheModule } from '@nestjs/cache-manager'
+import { RolesAuthGuard } from '../../../src/rest/auth/guards/roles-auth.guard'
+import { JwtAuthGuard } from '../../../src/rest/auth/guards/jwt-auth.guard'
 
 // https://blog.logrocket.com/end-end-testing-nestjs-typeorm/
 
@@ -55,6 +57,10 @@ describe('CategoriasController (e2e)', () => {
       // Pero ya se lo hemos inyectado arriba
       //.overrideProvider(CategoriasService)
       //.useValue(mockCategoriasService)
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true }) // Esto permite que todas las solicitudes pasen el JwtAuthGuard
+      .overrideGuard(RolesAuthGuard)
+      .useValue({ canActivate: () => true }) // Esto permite que todas las solicitudes pasen el RolesAuthGuard
       .compile()
 
     app = moduleFixture.createNestApplication()

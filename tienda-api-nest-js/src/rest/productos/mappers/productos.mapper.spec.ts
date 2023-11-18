@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ProductosMapper } from './productos.mapper'
-import { CreateProductoDto } from '../../dto/create-producto.dto'
-import { ProductoEntity } from '../../entities/producto.entity'
-import { CategoriaEntity } from '../../../categorias/entities/categoria.entity'
-import { ResponseProductoDto } from '../../dto/response-producto.dto'
+import { CreateProductoDto } from '../dto/create-producto.dto'
+import { ProductoEntity } from '../entities/producto.entity'
+import { CategoriaEntity } from '../../categorias/entities/categoria.entity'
+import { ResponseProductoDto } from '../dto/response-producto.dto'
 import { v4 as uuidv4 } from 'uuid'
 
 describe('ProductosMapper', () => {
