@@ -23,9 +23,9 @@ export function setupSwagger(app: INestApplication) {
     .addTag('Productos', 'Operaciones con productos')
     .addTag('Storage', 'Operaciones con almacenamiento')
     .addTag('Auth', 'Operaciones de autenticación')
-    .addBearerAuth()
+    .addBearerAuth() // Añadimos el token de autenticación
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('api', app, document)
+  SwaggerModule.setup('api', app, document) // http://localhost:3000/api
 }
