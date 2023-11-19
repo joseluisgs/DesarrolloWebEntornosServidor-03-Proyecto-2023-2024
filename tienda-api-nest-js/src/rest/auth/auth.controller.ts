@@ -2,7 +2,14 @@ import { Body, Controller, Logger, Post } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { UserSignUpDto } from './dto/user-sign.up.dto'
 import { UserSignInDto } from './dto/user-sign.in.dto'
-import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiInternalServerErrorResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -19,6 +26,22 @@ export class AuthController {
   }
 
   @Post('signin')
+  @ApiResponse({
+    status: 200,
+    description:
+      'El usuario se ha logueado correctamente devolviendo el token de acceso',
+    type: String,
+  })
+  @ApiBody({
+    description: 'Credenciales de acceso',
+    type: UserSignInDto,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Error interno de la api en bases de datos',
+  })
+  @ApiBadRequestResponse({
+    description: 'Error en los datos de entrada',
+  })
   async singIn(@Body() userSignInDto: UserSignInDto) {
     this.logger.log(`singIn: ${JSON.stringify(userSignInDto)}`)
     return await this.authService.singIn(userSignInDto)
