@@ -188,7 +188,7 @@ Aquí tienes las tablas actualizadas con la columna "Otras Salidas" y ejemplos d
 
 ## Autor
 
-Codificado con :sparkling*heart: por [José Luis González Sánchez](https://twitter.com/JoseLuisGS*)
+Codificado con :sparkling_heart: por [José Luis González Sánchez](https://twitter.com/JoseLuisGS*)
 
 [![Twitter](https://img.shields.io/twitter/follow/JoseLuisGS_?style=social)](https://twitter.com/JoseLuisGS_)
 [![GitHub](https://img.shields.io/github/followers/joseluisgs?style=social)](https://github.com/joseluisgs)
