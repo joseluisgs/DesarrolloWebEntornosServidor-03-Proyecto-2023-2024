@@ -24,10 +24,12 @@ import { CacheInterceptor } from '@nestjs/cache-manager'
 import { UsuarioExistsGuard } from './guards/usuario-exists.guard'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { Roles, RolesAuthGuard } from '../auth/guards/roles-auth.guard'
+import { ApiExcludeController } from '@nestjs/swagger'
 
 @Controller('pedidos')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cache
 @UseGuards(JwtAuthGuard, RolesAuthGuard)
+@ApiExcludeController()
 export class PedidosController {
   private readonly logger = new Logger(PedidosController.name)
 

@@ -9,12 +9,12 @@ async function bootstrap() {
   // Obtener las opciones de SSL
   const httpsOptions = getSSLOptions()
   const app = await NestFactory.create(AppModule, { httpsOptions })
+  // Configuración de la versión de la API
+  app.setGlobalPrefix(process.env.API_VERSION || 'v1')
   // Configuración de Swagger
   if (process.env.NODE_ENV === 'dev') {
     setupSwagger(app)
   }
-  // Configuración de la versión de la API
-  app.setGlobalPrefix(process.env.API_VERSION || 'v1')
   // Activamos las validaciones body y dtos
   app.useGlobalPipes(new ValidationPipe())
   // Configuración del puerto de escucha

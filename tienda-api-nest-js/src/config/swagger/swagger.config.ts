@@ -1,6 +1,8 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { INestApplication } from '@nestjs/common'
 
+// Para evitar que un endpint salga: @ApiExcludeController() // Excluir el controlador de Swagger
+
 export function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
     .setTitle('API REST Tienda Nestjs DAW 2023/2024')
@@ -19,6 +21,7 @@ export function setupSwagger(app: INestApplication) {
     .setLicense('CC BY-NC-SA 4.0', 'https://joseluisgs.dev/docs/license/')
     .setVersion('1.0.0')
     .addTag('Productos', 'Operaciones con productos')
+    .addTag('Storage', 'Operaciones con almacenamiento')
     .build()
 
   const document = SwaggerModule.createDocument(app, config)

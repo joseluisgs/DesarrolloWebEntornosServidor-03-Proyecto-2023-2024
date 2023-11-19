@@ -14,9 +14,11 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { extname } from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import { Request, Response } from 'express' // importamos Request y Response de express
+import { Request, Response } from 'express'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('storage')
+@ApiTags('Storage') // Aplicar el decorador en el controlador
 export class StorageController {
   private readonly logger = new Logger(StorageController.name)
 

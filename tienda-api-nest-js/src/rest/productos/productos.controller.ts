@@ -28,9 +28,11 @@ import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { Roles, RolesAuthGuard } from '../auth/guards/roles-auth.guard'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('productos')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
+@ApiTags('Productos') // Aplicar el decorador en el controlador
 export class ProductosController {
   private readonly logger: Logger = new Logger(ProductosController.name)
 

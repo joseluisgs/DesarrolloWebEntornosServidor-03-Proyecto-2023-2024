@@ -2,8 +2,10 @@ import { Body, Controller, Logger, Post } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { UserSignUpDto } from './dto/user-sign.up.dto'
 import { UserSignInDto } from './dto/user-sign.in.dto'
+import { ApiExcludeController } from '@nestjs/swagger'
 
 @Controller('auth')
+@ApiExcludeController()
 export class AuthController {
   private readonly logger = new Logger(AuthController.name)
 
