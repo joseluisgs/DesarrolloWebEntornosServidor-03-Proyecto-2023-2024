@@ -19,10 +19,12 @@ import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { Roles, RolesAuthGuard } from '../auth/guards/roles-auth.guard'
+import { ApiExcludeController } from '@nestjs/swagger'
 
 @Controller('categorias')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
 @UseGuards(JwtAuthGuard, RolesAuthGuard) // Aplicar el guard aquí para autenticados con JWT y Roles (lo aplico a nivel de controlador)
+@ApiExcludeController()
 export class CategoriasController {
   private readonly logger = new Logger(CategoriasController.name)
 

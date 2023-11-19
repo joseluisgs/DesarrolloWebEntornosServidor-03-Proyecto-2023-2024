@@ -9,11 +9,13 @@ import { DatabaseModule } from './config/database/database.module'
 import { PedidosModule } from './rest/pedidos/pedidos.module'
 import { AuthModule } from './rest/auth/auth.module'
 import { UsersModule } from './rest/users/users.module'
+import { CorsConfigModule } from './config/cors/cors.module'
 
 @Module({
   imports: [
     // Lo primero es cargar la configuración de la aplicación y que esta esté disponible en el módulo raíz
     ConfigModule.forRoot(),
+    CorsConfigModule, // Configurar el módulo de cors
     DatabaseModule, // Configurar el módulo de base de datos
     CacheModule.register(), // Configurar el módulo de caché
     AuthModule, // Inyectamos el modulo de autenticacion (JWT y Guards)
