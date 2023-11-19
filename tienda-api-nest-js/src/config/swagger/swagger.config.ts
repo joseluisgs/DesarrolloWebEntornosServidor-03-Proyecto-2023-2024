@@ -22,6 +22,8 @@ export function setupSwagger(app: INestApplication) {
     .setVersion('1.0.0')
     .addTag('Productos', 'Operaciones con productos')
     .addTag('Storage', 'Operaciones con almacenamiento')
+    .addTag('Auth', 'Operaciones de autenticación')
+    .addBearerAuth()
     .build()
 
   const document = SwaggerModule.createDocument(app, config)

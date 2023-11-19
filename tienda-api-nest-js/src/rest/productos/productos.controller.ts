@@ -28,7 +28,7 @@ import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { Roles, RolesAuthGuard } from '../auth/guards/roles-auth.guard'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
 @Controller('productos')
 @UseInterceptors(CacheInterceptor) // Aplicar el interceptor aquí de cahce
@@ -55,6 +55,7 @@ export class ProductosController {
   @Post()
   @HttpCode(201)
   @UseGuards(JwtAuthGuard, RolesAuthGuard) // Aplicar el guard aquí
+  @ApiBearerAuth() // Indicar que se requiere autenticación con JWT
   @Roles('ADMIN')
   async create(@Body() createProductoDto: CreateProductoDto) {
     this.logger.log(`Create producto ${createProductoDto}`)
