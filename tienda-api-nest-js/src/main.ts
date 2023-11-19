@@ -2,18 +2,19 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import * as process from 'process'
 import { ValidationPipe } from '@nestjs/common'
-import { readFileSync } from 'fs'
-import * as path from 'path'
+import { setupSwagger } from './config/swagger/swagger.config'
+import { getSSLOptions } from './config/ssl/ssl.config'
 
 async function bootstrap() {
-  // Leemos la configuración de los certificados SSL
-  const httpsOptions = {
-    key: readFileSync(path.resolve(process.env.SSL_KEY)),
-    cert: readFileSync(path.resolve(process.env.SSL_CERT)),
-  }
+  // Obtener las opciones de SSL
+  const httpsOptions = getSSLOptions()
   const app = await NestFactory.create(AppModule, { httpsOptions })
   // Configuración de la versión de la API
   app.setGlobalPrefix(process.env.API_VERSION || 'v1')
+  // Configuración de Swagger
+  if (process.env.NODE_ENV === 'dev') {
+    setupSwagger(app)
+  }
   // Activamos las validaciones body y dtos
   app.useGlobalPipes(new ValidationPipe())
   // Configuración del puerto de escucha

@@ -14,9 +14,16 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { extname } from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import { Request, Response } from 'express' // importamos Request y Response de express
+import { Request, Response } from 'express'
+import {
+  ApiNotFoundResponse,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
 @Controller('storage')
+@ApiTags('Storage') // Aplicar el decorador en el controlador
 export class StorageController {
   private readonly logger = new Logger(StorageController.name)
 
@@ -81,6 +88,20 @@ export class StorageController {
   }
 
   @Get(':filename')
+  @ApiResponse({
+    status: 200,
+    description:
+      'El fichero se ha encontrado y se devuelve el fichero en la respuesta',
+    type: String,
+  })
+  @ApiParam({
+    name: 'filename',
+    description: 'Nombre del fichero',
+    type: String,
+  })
+  @ApiNotFoundResponse({
+    description: 'El fichero no existe',
+  })
   getFile(@Param('filename') filename: string, @Res() res: Response) {
     this.logger.log(`Buscando fichero ${filename}`)
     const filePath = this.storageService.findFile(filename)
