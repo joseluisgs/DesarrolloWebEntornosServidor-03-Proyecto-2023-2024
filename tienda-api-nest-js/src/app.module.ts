@@ -14,7 +14,11 @@ import { CorsConfigModule } from './config/cors/cors.module'
 @Module({
   imports: [
     // Lo primero es cargar la configuración de la aplicación y que esta esté disponible en el módulo raíz
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot(
+      process.env.NODE_ENV === 'dev'
+        ? { envFilePath: '.env.dev' || '.env' }
+        : { envFilePath: '.env.prod' },
+    ),
     CorsConfigModule, // Configurar el módulo de cors
     DatabaseModule, // Configurar el módulo de base de datos
     CacheModule.register(), // Configurar el módulo de caché
