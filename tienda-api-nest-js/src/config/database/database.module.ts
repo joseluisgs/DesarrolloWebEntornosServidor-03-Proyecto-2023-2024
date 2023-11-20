@@ -26,6 +26,7 @@ import * as path from 'path'
           '../../dist/rest/**/*.entity{.ts,.js}',
         ], // Cargamos todas las entidades,
         synchronize: process.env.NODE_ENV === 'dev', // Esto es para que se sincronicen las entidades con la base de datos
+        //synchronize: true, // Esto es para que se sincronicen las entidades con la base de datos
         logging: process.env.NODE_ENV === 'dev' ? 'all' : false, // Esto es para que se muestren los logs de las consultas
         retryAttempts: 5,
         connectionFactory: (connection) => {

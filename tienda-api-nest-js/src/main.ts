@@ -6,6 +6,11 @@ import { setupSwagger } from './config/swagger/swagger.config'
 import { getSSLOptions } from './config/ssl/ssl.config'
 
 async function bootstrap() {
+  if (process.env.NODE_ENV === 'dev') {
+    console.log('🛠️ Iniciando Modo desarrollo')
+  } else {
+    console.log('🚗 Iniciando Modo producción')
+  }
   // Obtener las opciones de SSL
   const httpsOptions = getSSLOptions()
   const app = await NestFactory.create(AppModule, { httpsOptions })

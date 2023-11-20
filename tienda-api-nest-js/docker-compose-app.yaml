@@ -1,0 +1,26 @@
+# Servicios de la aplicación
+services:
+  # Servicio de la API REST
+  # comentar si no se quiere ejecutar en local o IDE
+  tienda-api-rest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tienda-api-rest
+    restart: always
+    env_file: .env.prod
+    ports:
+      - ${API_PORT}:3000
+    volumes:
+      - storage-dir:/app/storage-dir
+      - ./cert:/app/cert
+    networks:
+      - tienda-network
+
+# Volume para guardar los datos de la base de datos
+volumes:
+  storage-dir:
+
+networks:
+  tienda-network:
+    driver: bridge
